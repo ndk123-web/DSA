@@ -20,10 +20,10 @@ class BubbleSortJS {
 }
 
 // Use the class
-let myInput: number[] = [5, 3, 6, 8, 9, 1, 3, 35];
+let inputArray: number[] = [5, 3, 6, 8, 9, 1, 3, 35];
 console.log("Original Array: ", myInput);
 
-let myBubbleSort = new BubbleSortJS(myInput);  // 👈 correct class name and type
-let sortedArray: number[] = myBubbleSort.sort();
+let bubbleSortInstance = new BubbleSortJS(inputArray);  
+let sortedResult: number[] = bubbleSortInstance.sort();
 
-console.log("Sorted Array: ", sortedArray);
+console.log("Sorted Array: ", sortedResult);
