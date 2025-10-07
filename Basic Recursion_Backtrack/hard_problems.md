@@ -60,10 +60,83 @@ public:
         for (int i=0 ; i < n; i++){
             board[i] = s;
         }
+//         board = [
+//              "....",
+//              "....",
+//              "....",
+//              "...."
+//          ]
+
 
         putQueen(ans,board,0,n);
 
         return ans;
+    }
+};
+```
+
+### 2 Sudoku Solver
+
+```cpp
+class Solution {
+public:
+    bool isSafe(vector<vector<char>>& board, int row, int col,
+                int numberToPut) {
+
+        // check horizontally
+        for (int i = 0; i < 9; i++) {
+            if (board[row][i] == '0' + numberToPut)
+                return false;
+        }
+
+        // check vertically
+        for (int i = 0; i < 9; i++) {
+            if (board[i][col] == '0' + numberToPut)
+                return false;
+        }
+
+        // check between 3 X 3
+        int startCol = (col / 3) * 3;
+        int startRow = (row / 3) * 3;
+        for (int i = startRow; i < startRow + 3; i++) {
+            for (int j = startCol; j < startCol + 3; j++) {
+                if (board[i][j] == '0' + numberToPut) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    bool putNumberFromZeroToNine(vector<vector<char>>& board) {
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (board[i][j] == '.') {
+                    for (int num = 1; num < 10; num++) {
+                        if (isSafe(board, i, j, num)) {
+                            board[i][j] = '0' + num; // Place the number
+                            // Recurse: try to solve the rest of the board
+                            if (putNumberFromZeroToNine(board)) {
+                                return true; // If successful, propagate true
+                                             // upwards
+                            } else {
+                                // Backtrack: if this path didn't lead to a
+                                // solution, undo the placement
+                                board[i][j] = '.';
+                            }
+                        }
+                    }
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    void solveSudoku(vector<vector<char>>& board) {
+        putNumberFromZeroToNine(board);
     }
 };
 ```
