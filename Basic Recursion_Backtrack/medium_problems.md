@@ -165,3 +165,79 @@ public:
     }
 };
 ```
+
+### 5 Subset 1
+- Time -> O (N * 2^N)
+- Space -> O (2^N)
+```bash
+[]
+├── [1]
+│   ├── [1, 2]
+│   │   ├── [1, 2, 3]
+│   │   └── (backtrack to [1, 2])
+│   └── [1, 3]
+│       └── (backtrack to [1])
+│
+├── [2]
+│   ├── [2, 3]
+│   └── (backtrack to [2])
+│
+└── [3]
+    └── (backtrack to [])
+
+```
+```cpp
+class Solution {
+public:
+
+    void recursion(vector<int>& oneAns, vector<vector<int>>& ans, vector<int> &nums, int start){
+        ans.push_back(oneAns);
+
+        for(int i = start; i < nums.size(); i++){
+            oneAns.push_back(nums[i]);
+            recursion(oneAns,ans,nums,i+1);
+            oneAns.pop_back();
+        }
+    }
+
+    vector<vector<int>> subsets(vector<int>& nums) {
+        vector<vector<int>> ans;
+        vector<int> oneAns;
+
+        recursion(oneAns,ans,nums,0);
+
+        return ans;
+    }
+};
+```
+
+### 6 Subset 2
+- Time -> O (N * 2^N)
+- Space -> O (2^N)
+```cpp
+class Solution {
+public:
+
+    void recursion(vector<vector<int>>& ans, vector<int>& oneAns, int start, vector<int>& nums){
+        ans.push_back(oneAns);
+
+        for(int i = start; i < nums.size(); i++){
+            if( i > start && nums[i] == nums[i-1] ) continue;
+            oneAns.push_back(nums[i]);
+            recursion(ans,oneAns,i+1,nums);
+            oneAns.pop_back();
+        }
+    }
+
+    vector<vector<int>> subsetsWithDup(vector<int>& nums) {
+        vector<vector<int>> ans;
+        vector<int> oneAns;
+
+        sort(nums.begin(),nums.end());
+
+        recursion(ans,oneAns,0,nums);
+
+        return ans;
+    }
+};
+```
