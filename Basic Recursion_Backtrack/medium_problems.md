@@ -241,3 +241,45 @@ public:
     }
 };
 ```
+
+### 7 Permutations
+| Complexity Type     | Complexity | Explanation                                           |
+| ------------------- | ---------- | ----------------------------------------------------- |
+| **Time**            | O(N × N!)  | N! permutations, each costs O(N) work to copy + erase |
+| **Auxiliary Space** | O(N)       | Recursion stack + temp vectors per call               |
+| **Total Space**     | O(N × N!)  | Including output storage                              |
+
+```cpp
+class Solution {
+public:
+
+    void recursion(vector<vector<int>>& ans, vector<int>& oneAns, vector<int> &nums, int size){
+        if (nums.empty()){
+            ans.push_back(oneAns);
+            return;
+        }   
+
+        for (int i = 0; i < nums.size(); i++){
+            oneAns.push_back(nums[i]); // selects first
+
+            vector<int> tempNums(nums.begin(),nums.end());
+            // its erase only that index element (it takes iterator object)
+            tempNums.erase(tempNums.begin()+i);
+            
+            recursion(ans,oneAns,tempNums,size);
+            
+            // after done remove the added element on that specific loop 
+            oneAns.pop_back();
+        }
+    }
+
+    vector<vector<int>> permute(vector<int>& nums) {
+        vector<vector<int>> ans;
+        vector<int> oneAns;
+
+        recursion(ans,oneAns,nums,nums.size());
+
+        return ans;
+    }
+};
+```
