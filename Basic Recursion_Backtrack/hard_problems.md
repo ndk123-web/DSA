@@ -141,6 +141,7 @@ public:
 };
 ```
 
+### 3 Rat In Maze
 
 ```cpp
 // Online C++ compiler to run C++ program online
@@ -154,54 +155,54 @@ bool canGo(int row, int col, vector<vector<int>>& matrix) {
     // Check boundaries and validity
     if (row < 0 || col < 0 || row >= n || col >= n) return false;
     if (matrix[row][col] == 0 || matrix[row][col] == -1) return false;
-    
+
     return true;
 }
 
 void solveMaze(int row, int col, vector<vector<int>>& matrix, string& part, int size, vector<string>& ans){
-    
+
     if (row == size-1 && col == size-1){
         ans.push_back(part);
         return;
     }
-    
+
     // mark cell as visited
     matrix[row][col] = -1;
-    
+
     // check down
     if (canGo(row+1,col,matrix)){
         part = part + "D";
         solveMaze(row+1,col,matrix,part,size,ans);
         part.pop_back();
     }
-    
+
     // check up
     if (canGo(row-1,col,matrix)){
         part = part + "U";
         solveMaze(row-1,col,matrix,part,size,ans);
         part.pop_back();
     }
-    
+
     // check left
     if(canGo(row,col-1,matrix)){
         part = part + "L";
         solveMaze(row,col-1,matrix,part,size,ans);
         part.pop_back();
     }
-    
+
     // check right
     if(canGo(row,col+1,matrix)){
         part = part + "R";
         solveMaze(row,col+1,matrix,part,size,ans);
         part.pop_back();
     }
-    
+
     // unmark
     matrix[row][col] = 1;
 }
 
 int main() {
-    
+
     vector<vector<int>> matrix = {
         {1,0,0,0},
         {1,1,0,1},
@@ -210,13 +211,56 @@ int main() {
     };
     vector<string> ans;
     string part= "";
-    
+
     solveMaze(0,0,matrix,part,matrix.size(),ans);
-    
+
     for (auto i : ans){
         cout << i << " ";
     }
-    
+
     return 0;
 }
+```
+
+### 4 Kth Permutation
+
+```cpp
+class Solution {
+public:
+    void solvePermutations(string& input, string& ans, int& k, string& kans) {
+        if (input.empty()) {
+            k--;
+            if (k == 0)
+                kans = ans;
+            return;
+        }
+
+        for (int i = 0; i < input.size(); i++) {
+            ans.push_back(input[i]); // selects first
+
+            string tempInput(input.begin(), input.end());
+            // its erase only that index element (it takes iterator object)
+            tempInput.erase(tempInput.begin() + i);
+
+            solvePermutations(tempInput,ans,k,kans);
+
+            // after done remove the added element on that specific loop
+            ans.pop_back();
+        }
+    }
+
+    string getPermutation(int n, int k) {
+        string ans = "";
+        string input = "";
+        string kans = "";
+
+        for (int i = 1; i <= n; i++) {
+            input.push_back('0' + i);
+        }
+
+        solvePermutations(input, ans, k, kans);
+
+        return kans;
+    }
+};
 ```
