@@ -1,4 +1,41 @@
-### 1 Rotate Array By K Elements
+### 1 Intersection Of 2 Sorted Arrays
+- Worst Case -> O (N1 + N2)
+- Space -> O (1)
+```cpp
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+int main() {
+
+    // intersection between 2 sorted array
+    vector<int> arr1 = {1,2,2,3,3,4,5};
+    vector<int> arr2 = {2,3,3,5,6,6,7};
+    vector<int> inters;
+
+    int i=0,j=0;
+
+    while (i < arr1.size() && j < arr2.size()){
+        if (arr1[i] < arr2[j]){
+            i++;
+        }else if(arr1[i] == arr2[j]){
+            inters.push_back(arr1[i]);
+            i++;
+            j++;
+        }else{
+            j++;
+        }
+    }
+
+    for (auto i : inters){
+        cout << i << " ";
+    }
+
+    return 0;
+}
+```
+### 2 Rotate Array By K Elements
 - Time Complexity -> O (k*n)
 - Space Complexity -> O(n) (including arr)
 ```cpp
@@ -38,7 +75,7 @@ int main() {
 }
 ```
 
-### 2 Rotate Array Most Efficient Way
+### 3 Rotate Array Most Efficient Way
 ```cpp
 class Solution {
 public:
