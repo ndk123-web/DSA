@@ -120,3 +120,38 @@ public:
     }
 };
 ```
+
+### 5 Rearrange Array Elements by sign
+
+```cpp
+class Solution {
+public:
+    vector<int> rearrangeArray(vector<int>& nums) {
+        vector<int> pos;
+        vector<int> neg;
+        vector<int> ans;
+
+        // divide negative and positive 
+        for (int i = 0; i < nums.size(); i++) {
+            if (nums[i] < 0) {
+                neg.push_back(nums[i]);
+            } else if (nums[i] > 0) {
+                pos.push_back(nums[i]);
+            }
+        }
+
+        // observation is positive values are in even index 
+        // observation is negative values are in odd index
+        int p = 0, n = 0;
+        for (int i = 0; i < nums.size(); i++) {
+            if (i % 2 == 0) {
+                ans.push_back(pos[p++]);
+            } else {
+                ans.push_back(neg[n++]);
+            }
+        }
+
+        return ans;
+    }
+};
+```
