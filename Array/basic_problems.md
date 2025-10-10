@@ -98,31 +98,4 @@ public:
 };
 ```
 
-### Subarray Sum Equals K
 
-```cpp
-class Solution {
-public:
-    int subarraySum(vector<int>& nums, int k) {
-        int total = 0;
-        int cnt = 0;
-        unordered_map<int,int> mapp;
-
-        mapp[0] = 1;
-
-        for (int i=0; i < nums.size();i++){
-            total = total + nums[i];
-
-            // it means find returns iterator/not found
-            // end() means returns always iterators
-            if (mapp.find(total-k) != mapp.end()){
-                cnt = cnt + mapp[total-k];
-            }
-
-            mapp[total]++; // if key not exist then key:0 ++ means key:1
-        }
-
-        return cnt;
-    }
-};
-```
