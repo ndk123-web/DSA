@@ -131,7 +131,7 @@ public:
         vector<int> neg;
         vector<int> ans;
 
-        // divide negative and positive 
+        // divide negative and positive
         for (int i = 0; i < nums.size(); i++) {
             if (nums[i] < 0) {
                 neg.push_back(nums[i]);
@@ -140,7 +140,7 @@ public:
             }
         }
 
-        // observation is positive values are in even index 
+        // observation is positive values are in even index
         // observation is negative values are in odd index
         int p = 0, n = 0;
         for (int i = 0; i < nums.size(); i++) {
@@ -154,4 +154,86 @@ public:
         return ans;
     }
 };
+```
+
+### 6 Next Permutation
+
+- Steps:
+  1. Find First BreakPoint
+  2. Then After in place of BreakPoint put closest smaller number
+  3. swap that BreakPoint with Closest Smaller Number
+  4. In End Reverse Array After BreakPoint+1 to end
+  5. because we want after BreakPoint most smallest numbers
+
+```cpp
+class Solution {
+public:
+    void nextPermutation(vector<int>& nums) {
+        int i = nums.size() - 2;
+        int breakPoint = -1;
+
+        // 1️⃣ Find the breakpoint
+        while (i >= 0) {
+            if (nums[i] < nums[i + 1]) {
+                breakPoint = i;
+                break;
+            }
+            i--;
+        }
+
+        // if no breakpoint, reverse (already highest permutation)
+        if (breakPoint == -1) {
+            reverse(nums.begin(), nums.end());
+            return;
+        }
+
+        // 2️⃣ Find the smallest number greater than nums[breakPoint] to its right
+        int closestMaxIndex = breakPoint + 1;
+        for (int j = breakPoint + 1; j < nums.size(); j++) {
+            if (nums[j] > nums[breakPoint] && nums[j] <= nums[closestMaxIndex]) {
+                closestMaxIndex = j;
+            }
+        }
+
+        // 3️⃣ Swap them
+        swap(nums[breakPoint], nums[closestMaxIndex]);
+
+        // 4️⃣ Reverse right part
+        reverse(nums.begin() + breakPoint + 1, nums.end());
+    }
+};
+
+```
+
+### 7 Leader in Array
+- Time-> N
+- Space -> N 
+```cpp
+#include <bits/stdc++.h>
+
+using namespace std;
+
+int main() {
+
+    // Leader In Array
+    vector<int> arr = {10,22,12,3,0,6};
+    vector<int> ans;
+
+    int maxRight = arr.back();
+    ans.push_back(maxRight);
+
+    for (int i = arr.size() - 2; i >= 0; i--) {
+        if (arr[i] > maxRight) {
+            ans.push_back(arr[i]);
+            maxRight = arr[i];
+        }
+    }
+    reverse(ans.begin(), ans.end());
+
+    for (auto i : ans){
+        cout << i << " ";
+    }
+
+    return 0;
+}
 ```
