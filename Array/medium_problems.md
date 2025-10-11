@@ -206,8 +206,10 @@ public:
 ```
 
 ### 7 Leader in Array
+
 - Time-> N
-- Space -> N 
+- Space -> N
+
 ```cpp
 #include <bits/stdc++.h>
 
@@ -236,4 +238,180 @@ int main() {
 
     return 0;
 }
+```
+
+### 8 Longest Consecutive Sequence (Better)
+
+```cpp
+class Solution {
+public:
+    int longestConsecutive(vector<int>& nums) {
+
+        // sort first
+        sort(nums.begin(),nums.end());
+
+        // 1 2 3 4 100 200
+        int cnt = 0;
+        int longcnt = 0;
+
+        for (int i = 0; i < nums.size()-1; i++){
+
+            // for duplicates
+            if (nums[i] == nums[i+1]) continue;
+
+            // for checking i == i + 1
+            if (nums[i] + 1 == nums[i+1]){
+                cnt++;
+                longcnt = max(longcnt,cnt);
+                continue;
+            }
+            cnt=0;
+        }
+
+        return longcnt + 1;
+    }
+};
+```
+
+### 9 Longest Consecutive Sequence (Optimize)
+
+- Time -> N
+- Space -> N
+
+```cpp
+class Solution {
+public:
+    int longestConsecutive(vector<int>& nums) {
+        if (nums.empty()) return 0;
+
+        // N
+        unordered_set<int> sett(nums.begin(),nums.end());
+
+        int x = 0;
+        int longcnt=0;
+        int cnt=0;
+
+        for (auto it: sett){
+
+            // imp -> it means index is end it means we not found
+            // so it might be the first element
+            if(sett.find(it-1) == sett.end()){
+                cnt = 0;
+                x = it;
+                while (sett.find(x+1) != sett.end()){
+                    cnt++;
+                    x=x+1;
+                }
+                longcnt = max(longcnt,cnt);
+            }
+            else{
+                cnt = 0;
+            }
+        }
+
+        return longcnt + 1;
+    }
+};
+```
+
+### 10 Set Zeroes
+
+- Time -> N \* M
+- Space -> N \* M
+
+```cpp
+class Solution {
+public:
+    void setZeroes(vector<vector<int>>& matrix) {
+        vector<int> rowsTobeZero;
+        vector<int> colsTobeZero;
+
+        int m = matrix.size();
+        int n = matrix[0].size();
+
+        for(int i = 0; i < m; i++){
+            for(int j = 0; j < n; j++){
+                if(matrix[i][j] == 0){
+                    rowsTobeZero.push_back(i);
+                    colsTobeZero.push_back(j);
+                }
+            }
+        }
+
+        // Set rows to zero
+        for (int i = 0 ; i < rowsTobeZero.size(); i++){
+            int r = rowsTobeZero[i];
+            for (int j = 0 ; j < n; j++){
+                matrix[r][j] = 0;
+            }
+        }
+
+        // Set columns to zero
+        for (int i = 0 ; i < colsTobeZero.size(); i++){
+            int c = colsTobeZero[i];
+            for (int j = 0 ; j < m; j++){
+                matrix[j][c] = 0;
+            }
+        }
+    }
+};
+```
+
+### 11 Set Zeroes(Optimal)
+
+- Time -> N \* M
+- Space -> O (1)
+
+```cpp
+class Solution {
+public:
+    void setZeroes(vector<vector<int>>& matrix) {
+        int m = matrix.size(), n = matrix[0].size();
+        bool firstRowHasZero = false, firstColHasZero = false;
+
+        // Check first row
+        for (int j = 0; j < n; j++) {
+            if (matrix[0][j] == 0)
+                firstRowHasZero = true;
+        }
+
+        // Check first column
+        for (int i = 0; i < m; i++) {
+            if (matrix[i][0] == 0)
+                firstColHasZero = true;
+        }
+
+        // Use first row & column as markers
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                if (matrix[i][j] == 0) {
+                    matrix[i][0] = 0;
+                    matrix[0][j] = 0;
+                }
+            }
+        }
+
+        // Set zeros based on markers
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                if (matrix[i][0] == 0 || matrix[0][j] == 0) {
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+
+        // Handle first row
+        if (firstRowHasZero) {
+            for (int j = 0; j < n; j++)
+                matrix[0][j] = 0;
+        }
+
+        // Handle first column
+        if (firstColHasZero) {
+            for (int i = 0; i < m; i++)
+                matrix[i][0] = 0;
+        }
+    }
+};
+
 ```
