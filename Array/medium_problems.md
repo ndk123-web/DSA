@@ -415,3 +415,116 @@ public:
 };
 
 ```
+
+### 12 Rotate Matrix By 90 Deg (Brute)
+
+- T -> N^2
+- S -> N^2
+
+```cpp
+// Online C++ compiler to run C++ program online
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+int main() {
+
+    vector<vector<int>> mat = {
+        {1,2,3,4},
+        {5,6,7,8},
+        {9,10,11,12},
+        {13,14,15,16}
+    };
+
+    vector<vector<int>> ans(mat.begin(),mat.end());
+
+   for (int i = 0; i < mat.size(); i++){
+        for (int j = 0; j < mat.size(); j++){
+            ans[j][mat.size() - i - 1] = mat[i][j];
+        }
+    }
+
+    for (auto i : ans){
+        for (auto j : i){
+            cout << j << " ";
+        }
+        cout << endl;
+    }
+
+    return 0;
+}
+```
+
+### 13 Rotate Matrix In Place
+
+```cpp
+class Solution {
+public:
+    void rotate(vector<vector<int>>& matrix) {
+        int n = matrix.size();
+
+        // 1. Transpose the matrix [row -> col , col -> row]
+        for (int i = 0 ; i < n; i++){
+            for (int j = i+1 ; j < n; j++){
+                swap(matrix[i][j], matrix[j][i]);
+            }
+        }
+
+        // reverse each row
+        for (int i = 0 ; i < n; i++){
+           reverse(matrix[i].begin(),matrix[i].end());
+        }
+    }
+};
+```
+
+### 14 Spiral Matrix
+
+```cpp
+class Solution {
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        int n = matrix.size();
+        int m = matrix[0].size();
+        vector<int> ans;
+
+        int top = 0, bottom = n - 1;
+        int left = 0, right = m - 1;
+
+        while (top <= bottom && left <= right) {
+
+            // go right
+            for (int i = left; i <= right; i++) {
+                ans.push_back(matrix[top][i]);
+            }
+            top++;
+
+            // go down
+            for (int i = top; i <= bottom; i++) {
+                ans.push_back(matrix[i][right]);
+            }
+            right--;
+
+            // go left
+            if (top <= bottom) {
+                for (int i = right; i >= left; i--) {
+                    ans.push_back(matrix[bottom][i]);
+                }
+                bottom--; 
+            }
+
+            // go up
+            if (left <= right) { 
+                for (int i = bottom; i >= top; i--) {
+                    ans.push_back(matrix[i][left]);
+                }
+                left++;
+            }
+        }
+
+        return ans;
+    }
+};
+
+```
