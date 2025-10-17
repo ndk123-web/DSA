@@ -122,7 +122,7 @@ public:
 };
 ```
 
-### 4 Three sum
+### 4 Three sum (Optimized)
 
 ```cpp
 class Solution {
@@ -167,6 +167,39 @@ public:
             }
         }
        return ans;
+    }
+};
+```
+
+### Three Sum ( Hashing )
+
+- Time -> N^2
+- Space -> N
+
+```cpp
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        set<vector<int>> sett;
+        int n = nums.size();
+        sort(nums.begin(), nums.end()); // sort array first
+
+        for (int i = 0; i < n - 1; i++) {
+            if (i > 0 && nums[i] == nums[i - 1])
+                continue;         // skip duplicates
+
+            unordered_set<int> q; // to check the required number quickly
+
+            for (int j = i + 1; j < n; j++) {
+                int tobeFind = -(nums[i] + nums[j]);
+                if (q.find(tobeFind) != q.end()) {
+                    sett.insert({nums[i], tobeFind, nums[j]}); // sorted triplet
+                }
+                q.insert(nums[j]);
+            }
+        }
+
+        return vector<vector<int>>(sett.begin(), sett.end());
     }
 };
 ```
