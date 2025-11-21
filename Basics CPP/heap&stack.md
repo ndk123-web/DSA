@@ -4,8 +4,8 @@
 4. Runtime library (**not compiler**) takes extra memory from **OS** via **system calls** (`brk`, `sbrk`, `mmap`)
 5. Compiler / Runtime manage how your program uses that Space
 
-6. Stack
 
+1. Stack
 - Used For
   - Local Variables
   - Function parameters
