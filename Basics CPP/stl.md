@@ -7,6 +7,44 @@ vector , list , Deque , Stack , Queue , Priority Queue , Set , Multi Set , Unord
 
 ---
 
+## Iterators
+
+- Iterator means pointing to the some location (pointer)
+
+```cpp
+vector<int> v = {1,2,3};
+
+// it means 1's location is in "it"
+vector<int>::iterator it = v.begin();
+
+// dereference to get the actual data inside that address
+std::cout << *it
+```
+
+### Types of Iterators
+
+```cpp
+auto it = v.begin();   // first element
+auto it2 = v.end();    // LAST element ke baad
+
+auto it = v.rbegin(); // last element
+auto it2 = v.rend();  // first se pehle
+
+vector<int>::const_iterator it = v.begin();
+*it = 50; // error
+
+set<int> s = {10,20,30};
+auto it = s.begin();
+cout << *it;      // 10
+
+map<int,int> mp;
+mp[1] = 100;
+mp[2] = 200;
+
+auto it = mp.begin();
+cout << it->first << " " << it->second;
+```
+
 ## 1 Pair
 
 - Normal Pair
@@ -46,9 +84,11 @@ int main() {
 ```
 
 ## 2 Vector
+
 - Dynamic Array
 
 - Resizing → memory changed → old iterator invalid
+
 ```cpp
 auto it = v.begin();
 
