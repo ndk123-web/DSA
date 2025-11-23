@@ -45,6 +45,23 @@ auto it = mp.begin();
 cout << it->first << " " << it->second;
 ```
 
+## Iterators in Deep
+
+- Types of Iterators
+  | Container | Iterator Type |
+  | ------------------- | ---------------------- |
+  | vector | random access iterator |
+  | deque | random access iterator |
+  | list | bidirectional iterator |
+  | map / set | bidirectional iterator |
+  | unordered_map / set | forward iterator |
+
+  | Iterator Type | Moves             | Random Access |
+  | ------------- | ----------------- | ------------- |
+  | Random access | it+1, it+5, it[i] | YES           |
+  | Bidirectional | ++it, --it        | NO            |
+  | Forward       | ++it only         | NO            |
+
 ## 1 Pair
 
 - Normal Pair
@@ -234,7 +251,7 @@ int main() {
 }
 ```
 
-## Stack
+## 5 Stack
 
 - Simple LIFO (Last In First Out)
 
@@ -272,7 +289,7 @@ int main() {
 }
 ```
 
-## Queue
+## 6 Queue
 
 2. WHAT is queue?
 
@@ -310,9 +327,9 @@ int main() {
 }
 ```
 
-## Priority Queue (Min Heap / Max Heap / Custom Heap)
+## 7 Priority Queue (Min Heap / Max Heap / Custom Heap)
 
-- It uses Vector and Conceptual Tree
+- It uses Vector and Conceptual Binary Tree
 - We Get the Binary tree data using Maths Formulas
 
 ```bash
@@ -347,4 +364,218 @@ meaning big element niche → small top
 If child < parent → TRUE → child down
 meaning small element niche → big top
 → MAX HEAP
+```
+
+## 8 Set
+
+- C++ set = balanced BST (red-black tree).
+- All Operation -> O(Log N)
+
+- sorted (always increasing order)
+- unique (no duplicate)
+- internally tree
+- `No random access`
+- iterators are stable
+
+| Operation         | Complexity |
+| ----------------- | ---------- |
+| insert            | log(N)     |
+| erase             | log(N)     |
+| find              | log(N)     |
+| lower_bound       | log(N)     |
+| upper_bound       | log(N)     |
+| iterate whole set | O(N)       |
+
+- lower_bound(x) (Here only equal is extra with Greater)
+  → first element >= x
+
+- upper_bound(x) (Here must be Greater)
+  → first element > x
+
+```cpp
+// Online C++ compiler to run C++ program online
+#include <iostream>
+#include <set>
+
+using namespace std;
+
+int main() {
+
+    set<int> s;
+
+    s.insert(10);
+    s.insert(20);
+    s.insert(30);
+
+    auto it = s.find(110);
+    if (it == s.end()) {
+        cout << "Not Found Element 20";
+        return 0;
+    }
+    cout << *it;
+
+    // erase value 10
+    s.erase(10);
+
+    // erase iterator
+    s.erase(it);
+
+    return 0;
+}
+```
+
+## 9 MultiSet
+
+- Same as Set But (Duplicates Allowed)
+- lower_bound / upper_bound also work same as Set
+
+```cpp
+multiset<int> ms = {10,10,20,30};
+
+ms.erase(5) // removes all occurences of 5
+
+auto it = ms.find(10); // first 10
+ms.erase(it);          // removes ONLY that one
+
+// ms = {10,20,30}
+```
+
+## 10 Unordered Set
+
+- Its Build By using Hashing and Buckets
+- Each Bucket is Linked List
+- Features
+  ✔ Hash table
+  ✔ Unique elements
+  ✔ Not sorted
+  ✔ Average O(1)
+  ✔ Worst O(N) (rare)
+
+| Operation | Average | Worst |
+| --------- | ------- | ----- |
+| insert    | O(1)    | O(N)  |
+| find      | O(1)    | O(N)  |
+| count     | O(1)    | O(N)  |
+| erase     | O(1)    | O(N)  |
+
+```cpp
+unordered_set<int> us;
+
+us.insert(10);
+us.insert(20);
+us.insert(20); // ignored
+us.insert(30);
+
+cout << us.count(20); // 1
+us.erase(10);
+```
+
+## 11 Map
+
+- C++ map = balanced BST (red-black tree).
+- Its Tree Inside Like Set but In map this tree is for the Key
+
+- Properties:
+  - keys unique
+  - sorted by key
+  - O(log N) insert/find/erase
+  - values stored with keys
+  - supports iterators
+  - supports lower_bound, upper_bound
+
+```cpp
+// Online C++ compiler to run C++ program online
+#include <iostream>
+#include <map>
+
+using namespace std;
+
+int main() {
+
+    map<int,int> mp;
+
+    mp[2] = 200;
+    mp[3] = 300;
+    mp[1] = 100;
+
+
+    for (auto i : mp){
+        cout << i.first << " " << i.second << "\n";
+    }
+
+    return 0;
+}
+```
+
+### 12 MultiMap (Same as Map But Duplicate Keys)
+
+- ✔ Exactly like map
+- ✔ BUT keys can be duplicated
+- ✔ Still sorted
+- ✔ Still uses red-black tree
+
+| Operation | Time |
+| --------- | ---- |
+| insert    | logN |
+| find      | logN |
+| erase     | logN |
+| iterate   | O(N) |
+
+```cpp
+
+```
+
+## Unordered Map
+
+- unordered_map hashing use karta → O(1) average
+
+- ✔ Hash table
+- ✔ Key–value pairs
+- ✔ Unique keys
+- ✔ NOT sorted
+- ✔ Average O(1) ops
+- ✔ Worst case O(N) (rare)
+  | Feature | unordered_map | map |
+  | -------------- | ------------- | -------------- |
+  | Speed | O(1) avg | O(log N) |
+  | Order | random | sorted |
+  | Internal | hash table | red-black tree |
+  | lower_bound | ❌ | ✔ |
+  | duplicate keys | ❌ | ❌ |
+  | best for | fast lookup | ordered lookup |
+
+```cpp
+unordered_map<string,int> mp;
+
+mp["ndk"] = 1;
+mp["coder"] = 2;
+mp["ndk"] += 5;
+
+for(auto &p : mp){
+    cout << p.first << " " << p.second << endl;
+}
+```
+
+## Unordered MultiMap
+
+- Same as unordered_map BUT :
+  ✔ Duplicate keys allowed
+  ✔ Internally hash table
+  ✔ No order
+  ✔ fast operations O(1) avg
+
+```cpp
+unordered_multimap<int,string> umm;
+
+umm.insert({10, "apple"});
+umm.insert({10, "banana"});
+umm.insert({20, "carrot"});
+
+// l point to first 10 "apple"
+// r point to last 10's aafter object which is 20 "carrot"
+auto [l, r] = umm.equal_range(10);
+
+for(auto it = l; it != r; it++){
+    cout << it->first << " -> " << it->second << "\n";
+}
 ```
