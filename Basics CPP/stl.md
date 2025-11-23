@@ -7,6 +7,16 @@ vector , list , Deque , Stack , Queue , Priority Queue , Set , Multi Set , Unord
 
 ---
 
+---
+
+✔ Vector → Reallocates = ❌ Unsafe
+✔ Deque → Sometimes reallocate = ❌ Unsafe
+✔ List → Never reallocate = ✔ Safe
+✔ Map / Set (Tree) → Never reallocate = ✔ Safe
+✔ Unordered (Hash) → Rehash = ❌ Unsafe
+
+---
+
 ## Iterators
 
 - Iterator means pointing to the some location (pointer)
@@ -138,6 +148,7 @@ int main() {
 
 - Doubly LinkeldList
 - `No Random Access`
+- `Doesn't Reallocate On Resize like Vector`
 
 ```bash
 [ prev | data | next ]
