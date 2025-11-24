@@ -4,4 +4,4 @@
 2. Hashing Apporach
 3. Recursion 
 4. Recursion with Backtrack 
-5. Binray search Approach 
+5. Binray search Approach   
