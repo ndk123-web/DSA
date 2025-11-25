@@ -18,12 +18,16 @@ struct TrieNode {
 
 class Trie {
     public:
+
+        // root
         TrieNode* root;
 
+        // created root in heap 
         Trie(){
             root = new TrieNode();
         }
 
+        // insert string inside the trie 
         void insert(string str) {
             
             // current pointer pointing initially to the root 
@@ -46,6 +50,7 @@ class Trie {
             current->isEnd = true;
         }
 
+        // return t / f based on str present or not in trie
         bool search(string str) {
             TrieNode* current = root;
 
@@ -58,9 +63,12 @@ class Trie {
             }
 
 
-            return (current->isEnd == true ? true : false);
+            bool ans = current->isEnd == true ? true : false;
+
+            return ans;
         }
 
+        // actual function that is visualizing the entire trie using recursion
         void printTrie(TrieNode* node, string prefix) {
 
             for (int i = 0; i < 26; i++) {
@@ -77,15 +85,24 @@ class Trie {
             }
         }
 
+        // visualize calls printTrie 
         void visualize() {
             cout << "Trie Structure:\n";
             printTrie(root, "");
         }
+
+        // cleanup the root from heap 
+        void destroy() {
+            delete root;
+        }
 };
 
 int main (){
+
+    // created object of Trie and initilize root on heap
     Trie trie;
 
+    // insert strings in heap 
     trie.insert("cat");
     trie.insert("cap");
     trie.insert("com");
@@ -98,5 +115,8 @@ int main (){
     //     cout << "cat not exists";
     // }
 
+    // visualize entire trie from heap
     trie.visualize();
+
+
 }
