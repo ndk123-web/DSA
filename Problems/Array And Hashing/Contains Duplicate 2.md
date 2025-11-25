@@ -77,15 +77,17 @@ bool containsDuplicate(vector<int>& nums) {
 ## 4. Optimal Approach (Hashing)
 
 - ✔ Approach A — Using unordered_map
+
   - Idea
   - Store frequency in hashmap.
   - If any frequency > 1, duplicate exists.
 
 - Complexity
-    - Time: O(n)
-    - Space: O(n)
+  - Time: O(n)
+  - Space: O(n)
 
 Code
+
 ```cpp
 bool containsDuplicate(vector<int>& nums) {
     unordered_map<int,int> freq;
@@ -97,18 +99,19 @@ bool containsDuplicate(vector<int>& nums) {
 }
 ```
 
-
 - ✔ Approach B — Using set (ordered set)
 
-    - Idea
-    1. Try inserting elements  one by one.
-    2. If an element already exists → duplicate found.
+  - Idea
+
+  1. Try inserting elements one by one.
+  2. If an element already exists → duplicate found.
 
 - Complexity
-    - Time: O(n log n)
-    - Space: O(n)
+  - Time: O(n log n)
+  - Space: O(n)
 
 Code
+
 ```cpp
 bool containsDuplicate(vector<int>& nums) {
     set<int> st;
@@ -121,16 +124,18 @@ bool containsDuplicate(vector<int>& nums) {
 ```
 
 - ✔ Approach C — Using unordered_set (BEST)
-    
-    - Idea
-    1. HashSet gives O(1) average lookup.
-    2. Insert each element; if already present → duplicate.
+
+  - Idea
+
+  1. HashSet gives O(1) average lookup.
+  2. Insert each element; if already present → duplicate.
 
 - Complexity
-    - Time: O(n)
-    - Space: O(n)
+  - Time: O(n)
+  - Space: O(n)
 
 Code
+
 ```cpp
 bool containsDuplicate(vector<int>& nums) {
     unordered_set<int> seen;
@@ -144,11 +149,13 @@ bool containsDuplicate(vector<int>& nums) {
 
 - ✔ Approach D — Size Comparison Trick (Cleanest)
 
-    - Idea
-    1. Insert all elements into an unordered_set.
-    2. If duplicates existed → set size < array size.
+  - Idea
+
+  1. Insert all elements into an unordered_set.
+  2. If duplicates existed → set size < array size.
 
 - Steps
+
 1. Create hashset
 2. Insert all numbers
 3. Compare sizes
@@ -158,6 +165,7 @@ bool containsDuplicate(vector<int>& nums) {
   - Space: O(n)
 
 Code
+
 ```cpp
 bool containsDuplicate(vector<int>& nums) {
     unordered_set<int> uniqueValues;
@@ -195,21 +203,19 @@ true
 ```
 
 ## 6. Final Complexity Comparison
-   1. Approach Time Space Notes
-   2. Sorting O(n log n) O(1) 3. No hashing, but slower
-   unordered_map O(n) O(n) Tracks counts
-   4. set O(n log n) O(n) Balanced tree
-   5. unordered_set O(n) O(n) Fastest & best
-   6. size compare (set) O(n) O(n) Clean & short
+
+- Approach Time Space Notes
+  1.  Sorting O(n log n) , O(1) Space No hashing, but slower
+  2.  unordered_map O(n) O(n) Tracks counts
+  3.  set O(n log n) O(n) Balanced tree
+  4.  unordered_set O(n) O(n) Fastest & best
+  5.  size compare (set) O(n) O(n) Clean & short
 
 ## 7. Notes
 
 - Best general solution: unordered_set
-
 - Sorting is okay when space is restricted and duplicates detection order doesn't matter
-
 - Map is overkill (counts not needed)
-
 - Hash collisions theoretically slow but practically very fast
 
 C++20 contains() is cleaner for sets
