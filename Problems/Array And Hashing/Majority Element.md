@@ -1,3 +1,4 @@
+
 ---
 
 # 📌 **Majority Element — Boyer–Moore (+ HashMap Method)**
