@@ -5,7 +5,7 @@ using namespace std;
 
 // Cycle Sort
 // has O(N) Time and O(1) Space
-// Only Can use when Number are in Range 
+// Only Can use when Number are in Range Which Must Be Unique
 
 int main() {
 
