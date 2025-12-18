@@ -1,4 +1,3 @@
-
 ---
 
 # 📘 **Daily Temperatures — Brute to Optimal**
@@ -146,25 +145,27 @@ If today's temperature is higher than previous days:
 class Solution {
 public:
     vector<int> dailyTemperatures(vector<int>& nums) {
-        vector<pair<int,int>> st;   // {temperature, index}
+        stack<pair<int,int>> data;
         int n = nums.size();
-        vector<int> res(n, 0);
+        vector<int> res(n,0);
 
-        for (int i = 0; i < n; i++) {
-
-            // resolve all colder days
-            while (!st.empty() && st.back().first < nums[i]) {
-                res[st.back().second] = i - st.back().second;
-                st.pop_back();
+        // val , idx
+        for (int i = 0 ; i < n; i++) {
+            while (!data.empty() && data.top().first < nums[i]) {
+                res[data.top().second] = i - data.top().second ;
+                data.pop();
             }
 
-            // push current day
-            st.push_back({nums[i], i});
+            data.push({nums[i],i});
+            // else {
+            // data.push_back({nums[i],i});
+            // }
         }
 
         return res;
     }
 };
+
 ```
 
 ---
