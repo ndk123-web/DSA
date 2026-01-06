@@ -158,25 +158,31 @@ public:
 ```cpp
 class Solution {
 private:
-    unordered_map<int, int> mapp;
     vector<int> res;
 
-    void view(TreeNode* root, int d) {
-        if (!root) return;
+    void view(TreeNode* root, int d = 0) {
+        if (!root)
+            return;
 
-        // first node at this depth
-        if (mapp.find(d) == mapp.end()) {
-            mapp[d] = root->val;
+        if (res.size() == d) {
             res.push_back(root->val);
         }
 
         view(root->right, d + 1);
+
         view(root->left, d + 1);
+        if (res.size() == d) {
+            res.push_back(root->val);
+        }
+
+        return;
     }
 
 public:
     vector<int> rightSideView(TreeNode* root) {
-        if (!root) return res;
+        if (!root)
+            return res;
+
         view(root, 0);
         return res;
     }
