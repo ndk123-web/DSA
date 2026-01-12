@@ -1,4 +1,4 @@
-# 📘 K Closest Points to Origin 
+# 📘 K Closest Points to Origin
 
 ## Problem Summary
 
@@ -8,23 +8,24 @@ You are given a list of points on a 2D plane:
 points[i] = [xi, yi]
 ```
 
-The distance of a point from the origin `(0,0)` is:
+The distance of a point from the origin `(0, 0)` is:
 
 ```
 distance = x² + y²
 ```
 
-(We don’t take square root because relative order is enough.)
+> We do **not** take the square root because relative ordering is sufficient.
 
 ### Goal
 
 Return the **k points closest to the origin**.
+The order of the returned points does **not** matter.
 
 ---
 
 ## Key Observation
 
-This is a **Top-K problem**.
+This is a classic **Top-K problem**.
 
 Whenever a problem asks for:
 
@@ -33,16 +34,17 @@ Whenever a problem asks for:
 - k closest
 - k most frequent
 
-👉 **Heap is the natural data structure**.
+👉 **Heap or Selection algorithms are the natural tools**.
 
 ---
 
-## Two Valid Approaches
+## Approaches Covered
 
-We solve the same problem using **two heap strategies**:
+We solve the same problem using **three different strategies**, each with different trade-offs:
 
-1. **Min-Heap (n log n)** — simpler, but slower
+1. **Min-Heap (n log n)** — simple, brute-force
 2. **Max-Heap of size k (n log k)** — optimized and preferred
+3. **Quickselect (average O(n))** — fastest in practice for static input
 
 ---
 
@@ -81,59 +83,48 @@ public:
 
 ## How This Works
 
-1. Compute distance of **every point**
+1. Compute distance for **every point**
 2. Push `(distance, point)` into a **min-heap**
-3. Min-heap keeps **smallest distance at the top**
-4. Pop top `k` elements → those are the k closest points
-
----
-
-## Why This Is Correct
-
-- Heap guarantees smallest distance on top
-- We extract exactly `k` smallest distances
-- Duplicates and order don’t matter
+3. The heap keeps the **closest point on top**
+4. Pop the top `k` elements
 
 ---
 
 ## Complexity Analysis
 
-Let `n = number of points`
+Let `n = number of points`.
 
 ### Time
 
-- Insert all points: `O(n log n)`
-- Extract k points: `O(k log n)`
-
 ```
-Overall: O(n log n)
+O(n log n)
 ```
 
 ### Space
 
 ```
-O(n)  // heap stores all points
+O(n)   // heap stores all points
 ```
 
 ---
 
 ## Downsides
 
-❌ Heap stores **all n points**
+❌ Stores all `n` points
 ❌ More work than necessary
 ❌ Not optimal when `k << n`
 
 ---
 
-## When to Use This
+## When to Use
 
-✅ When simplicity matters
-✅ When n is small
-❌ Not ideal for interviews or large inputs
+✅ Easy to understand
+❌ Not interview-optimal
+❌ Poor scalability
 
 ---
 
-# 🔵 Solution 2 — Max-Heap of Size k (Optimized)
+# 🔵 Solution 2 — Max-Heap of Size k (Optimized Heap)
 
 ### Code
 
@@ -157,8 +148,10 @@ public:
         }
 
         while (!pq.empty()) {
-            res.push_back({pq.top().second.first,
-                           pq.top().second.second});
+            res.push_back({
+                pq.top().second.first,
+                pq.top().second.second
+            });
             pq.pop();
         }
 
@@ -169,23 +162,21 @@ public:
 
 ---
 
-## Core Idea (This Is the Key Insight)
+## Core Idea
 
 > **We only care about the k closest points.
-> Everything farther than the k-th closest is useless.**
+> Everything farther than the k-th closest is irrelevant.**
 
-So:
+So we:
 
 - Keep a heap of size **at most k**
-- Always remove the **farthest** point when size exceeds k
+- Remove the **farthest** point whenever size exceeds k
 
 ---
 
 ## Why Max-Heap?
 
-We want to remove the **farthest point** quickly.
-
-So we use:
+We want to remove the **farthest** point quickly:
 
 ```
 max-heap → top = farthest point
@@ -193,50 +184,143 @@ max-heap → top = farthest point
 
 ---
 
-## How This Works (Step-by-Step)
-
-For each point:
-
-1. Compute distance
-2. Push into max-heap
-3. If heap size > k → pop the farthest point
-
-At the end:
-
-- Heap contains **exactly k closest points**
-- Order does not matter
-
----
-
 ## Complexity Analysis
 
 ### Time
 
-- For each point:
-
-  - Push: `O(log k)`
-  - Possible pop: `O(log k)`
-
 ```
-Overall: O(n log k)
+O(n log k)
 ```
 
 ### Space
 
 ```
-O(k)  // heap never grows beyond k
+O(k)
 ```
 
 ---
 
-## Why This Is Better
+## Why This Is Better Than Solution 1
 
-| Aspect              | Min-Heap   | Max-Heap (k size) |
-| ------------------- | ---------- | ----------------- |
-| Time                | O(n log n) | ✅ O(n log k)     |
-| Space               | O(n)       | ✅ O(k)           |
-| Scales well         | ❌         | ✅                |
-| Interview preferred | ❌         | ✅                |
+| Aspect           | Min-Heap   | Max-Heap (k size) |
+| ---------------- | ---------- | ----------------- |
+| Time             | O(n log n) | ✅ O(n log k)     |
+| Space            | O(n)       | ✅ O(k)           |
+| Scales well      | ❌         | ✅                |
+| Interview choice | ❌         | ✅                |
+
+---
+
+# 🟣 Solution 3 — Quickselect (Selection Algorithm)
+
+### Code
+
+```cpp
+class Solution {
+public:
+    vector<vector<int>> kClosest(vector<vector<int>>& points, int k) {
+        quickselect(points, 0, points.size() - 1, k);
+        return vector<vector<int>>(points.begin(), points.begin() + k);
+    }
+
+    void quickselect(vector<vector<int>>& points, int left, int right, int k) {
+        if (left >= right) return;
+
+        int pivotIndex = partition(points, left, right);
+
+        if (pivotIndex == k) return;
+        else if (pivotIndex < k)
+            quickselect(points, pivotIndex + 1, right, k);
+        else
+            quickselect(points, left, pivotIndex - 1, k);
+    }
+
+    int partition(vector<vector<int>>& points, int left, int right) {
+        long long pivotDist = dist(points[right]);
+        int p = left;
+
+        for (int i = left; i < right; i++) {
+            if (dist(points[i]) <= pivotDist) {
+                swap(points[i], points[p]);
+                p++;
+            }
+        }
+        swap(points[p], points[right]);
+        return p;
+    }
+
+    long long dist(const vector<int>& p) {
+        return (long long)p[0]*p[0] + (long long)p[1]*p[1];
+    }
+};
+```
+
+---
+
+## Core Idea
+
+Quickselect is based on **Quicksort’s partitioning**, but:
+
+> Instead of fully sorting the array,
+> we recurse only into the side that contains the k closest points.
+
+After partitioning:
+
+```
+[ closer points | pivot | farther points ]
+```
+
+We only continue on the side that still needs processing.
+
+---
+
+## Why This Works
+
+- After Quickselect finishes, the **first k elements** are the k closest
+- Order inside those k elements does **not** matter
+- No heap required
+- In-place algorithm
+
+---
+
+## Complexity Analysis
+
+### Average Case
+
+```
+Time  : O(n)
+Space : O(1)
+```
+
+### Worst Case
+
+```
+Time  : O(n²)
+```
+
+Worst case occurs with consistently bad pivot choices.
+
+---
+
+## Heap vs Quickselect — Comparison
+
+| Aspect         | Heap (n log k) | Quickselect |
+| -------------- | -------------- | ----------- |
+| Average Time   | O(n log k)     | ✅ O(n)     |
+| Worst Case     | O(n log k)     | ❌ O(n²)    |
+| Space          | O(k)           | ✅ O(1)     |
+| Streaming      | ✅ Yes         | ❌ No       |
+| Deterministic  | ✅ Yes         | ❌ No       |
+| Interview Safe | ✅ Yes         | ⚠️ Depends  |
+
+---
+
+## When to Use Which
+
+- **Streaming input** → Heap
+- **Large n, small k** → Max-heap of size k
+- **Static input, fastest average** → Quickselect
+- **Interview safest** → Heap
 
 ---
 
@@ -246,37 +330,29 @@ O(k)  // heap never grows beyond k
 x² + y²
 ```
 
-- Square root is expensive
-- Relative ordering is same
-- Avoids floating-point issues
-
----
-
-## Important Details
-
-- Use `long long` for distance to avoid overflow
-- Order of result does **not** matter
-- Both solutions are correct
+- Square root is unnecessary
+- Ordering remains the same
+- Avoids floating-point errors
 
 ---
 
 ## Final Mental Model (Lock This In)
 
-> **Top-K problems = Heap problems**
-
-- Want smallest k → **max-heap of size k**
-- Want largest k → **min-heap of size k**
+> **Top-K problems have two families of solutions:**
+>
+> - **Heap** → stable, streaming, guaranteed
+> - **Quickselect** → fast, in-place, average-optimal
 
 ---
 
 ## Final Recommendation
 
-- Use **Solution 1** to understand the idea
-- Use **Solution 2** in interviews and production
-- If `k` is small and `n` is large → **always n log k**
+- Learn **Solution 2 (Heap)** first
+- Understand **Solution 3 (Quickselect)** for optimization
+- Choose based on **constraints**, not preference
 
 ---
 
 ### One-Line Takeaway
 
-> **Don’t store everything if you only need the best k.**
+> **Don’t sort the whole world when you only need the best k.**
