@@ -1,59 +1,43 @@
-# Design Twitter
+# 📘 Design Twitter 
 
 ## Problem Summary
 
-Design a simplified version of Twitter that supports the following operations:
+Design a simplified Twitter that supports:
 
-- Post a tweet
-- Follow / unfollow users
-- Get a user’s news feed
+- Posting tweets
+- Following / unfollowing users
+- Fetching the **10 most recent tweets** in a user’s news feed
 
 ### Rules
 
-- Each tweet has a **unique tweetId**
-- Each tweet takes place at a **specific time**
-- A user’s news feed contains:
+- Tweet IDs are unique
+- Tweets are ordered by **recency**
+- News feed includes:
 
-  - Their **own tweets**
-  - Tweets from users they **follow**
+  - User’s own tweets
+  - Tweets from users they follow
 
-- News feed shows **at most 10 tweets**
-- Tweets are ordered from **most recent → least recent**
-
----
-
-## Why This Problem Is Tricky
-
-This is **not** just a map or list problem.
-
-The hard part is:
-
-> **Merging tweets from multiple users by recency and returning only the latest 10.**
-
-That immediately tells us:
-
-- We need **time ordering**
-- We need **Top-K (10) most recent**
-- We need **efficient merging**
-
-👉 This naturally leads to **heap + timestamp**.
+- Return **at most 10 tweets**, newest first
 
 ---
 
-## High-Level Design
+## Core Insight
 
-### Core Ideas
+This problem is about:
 
-1. **Every tweet needs a timestamp**
-2. **Each user can follow many users**
-3. **News feed = merge tweets from multiple users**
-4. **Only top 10 most recent tweets matter**
+> **Merging tweets from multiple users based on time and returning Top-10**
+
+So the real challenges are:
+
+- Maintaining **tweet order**
+- Handling **multiple followees**
+- Efficiently extracting **latest tweets**
 
 ---
 
-## Data Structures Used
+## Data Model (Common to Both Solutions)
 
-### 1️⃣ Tweet Storage
+### Tweets
 
 ```cpp
 unordered_map<int, vector<pair<int,int>>> tweets;
@@ -62,134 +46,223 @@ unordered_map<int, vector<pair<int,int>>> tweets;
 Stores:
 
 ```
-userId → [ (time, tweetId), ... ]
+userId → [(time, tweetId), ...]
 ```
 
-Each user’s tweets are naturally ordered by time.
+Time is required to compare recency.
 
 ---
 
-### 2️⃣ Follow Relationships
+### Follow Relationship
 
 ```cpp
-unordered_map<int, unordered_set<int>> followMap;
+followerId → list / set of followees
 ```
 
-Stores:
+This direction is critical because:
 
-```
-follower → { followee1, followee2, ... }
-```
-
-A user can follow **multiple users**.
+> Feed is pulled by the follower, not pushed by followees.
 
 ---
 
-### 3️⃣ Max Heap (for News Feed)
+# 🟢 Solution 1 — Brute Force (Max-Heap Merge)
 
-```cpp
-priority_queue<pair<int,int>>
-```
-
-Stores:
-
-```
-(time, tweetId)
-```
-
-Ensures we always get the **most recent tweet first**.
+This is **simple, intuitive, and correct**, but not optimized.
 
 ---
 
-## Algorithm Breakdown
+## Idea
 
-### 🔹 postTweet(userId, tweetId)
+1. Collect **all tweets** from:
 
-- Store `(time, tweetId)` in user’s tweet list
-- Increment global timestamp
+   - User
+   - All followees
 
----
+2. Push them into a **max-heap by time**
+3. Pop top 10 tweets
 
-### 🔹 follow(followerId, followeeId)
-
-- Add followee to follower’s follow set
-- Ignore self-follow
+This is a **full merge + top-10 extraction**.
 
 ---
 
-### 🔹 unfollow(followerId, followeeId)
-
-- Remove followee from follower’s follow set
-
----
-
-### 🔹 getNewsFeed(userId)
-
-1. Push **own tweets** into max heap
-2. Push **followees’ tweets** into max heap
-3. Pop **top 10 tweets** from heap
-4. Return tweetIds in order
-
-This is essentially a **k-way merge using a heap**.
-
----
-
-## ✅ Correct & Working Code (With Short Comments)
+## Code (Brute Force)
 
 ```cpp
 class Twitter {
 private:
-    int time = 0; // global timestamp
-
-    // user -> list of {time, tweetId}
     unordered_map<int, vector<pair<int,int>>> tweets;
-
-    // user -> set of followees
-    unordered_map<int, unordered_set<int>> followMap;
+    unordered_map<int, vector<int>> followMap;
+    int time = 0;
 
 public:
     Twitter() {}
 
-    // Post a tweet
     void postTweet(int userId, int tweetId) {
         tweets[userId].push_back({time++, tweetId});
     }
 
-    // Retrieve the 10 most recent tweets
     vector<int> getNewsFeed(int userId) {
         vector<int> res;
-
-        // Max heap sorted by time
-        priority_queue<pair<int,int>> pq;
+        priority_queue<pair<int,int>> maxHeap;
 
         // Add user's own tweets
-        for (auto &t : tweets[userId]) {
-            pq.push(t);
+        for (auto& t : tweets[userId]) {
+            maxHeap.push(t);
         }
 
         // Add followees' tweets
-        for (int followee : followMap[userId]) {
-            for (auto &t : tweets[followee]) {
-                pq.push(t);
+        for (int f : followMap[userId]) {
+            for (auto& t : tweets[f]) {
+                maxHeap.push(t);
             }
         }
 
-        // Extract top 10 recent tweets
-        while (!pq.empty() && res.size() < 10) {
-            res.push_back(pq.top().second);
-            pq.pop();
+        // Extract 10 most recent tweets
+        while (!maxHeap.empty() && res.size() < 10) {
+            res.push_back(maxHeap.top().second);
+            maxHeap.pop();
         }
 
         return res;
     }
 
-    // Follow a user
     void follow(int followerId, int followeeId) {
         if (followerId == followeeId) return;
-        followMap[followerId].insert(followeeId);
+
+        auto& v = followMap[followerId];
+        if (find(v.begin(), v.end(), followeeId) == v.end()) {
+            v.push_back(followeeId);
+        }
     }
 
-    // Unfollow a user
+    void unfollow(int followerId, int followeeId) {
+        auto& v = followMap[followerId];
+        auto it = find(v.begin(), v.end(), followeeId);
+        if (it != v.end()) v.erase(it);
+    }
+};
+```
+
+---
+
+## Why This Works
+
+- Heap ensures **global ordering by time**
+- Max-heap top is always the **most recent tweet**
+- Correctly merges tweets across users
+
+---
+
+## Complexity (Brute Force)
+
+Let:
+
+- `T` = total tweets of user + followees
+
+### Time
+
+```
+getNewsFeed → O(T log T)
+```
+
+### Space
+
+```
+O(T)
+```
+
+---
+
+## Downsides
+
+❌ Pushes **all tweets** into heap
+❌ Inefficient when users have many tweets
+❌ Not optimal for large inputs
+
+---
+
+## When to Use
+
+- Learning / clarity
+- Small constraints
+- First working solution
+
+---
+
+# 🔵 Solution 2 — Optimized (Top-10 Min-Heap + Set)
+
+This is the **interview-preferred and scalable solution**.
+
+---
+
+## Key Optimization Idea
+
+> We only need the **latest 10 tweets** — everything else is irrelevant.
+
+So:
+
+- Maintain a **min-heap of size 10**
+- Always discard older tweets
+- Use a **set** for fast follow/unfollow
+
+---
+
+## Code (Optimized)
+
+```cpp
+class Twitter {
+private:
+    int time = 0;
+    unordered_map<int, vector<pair<int,int>>> tweets;
+    unordered_map<int, unordered_set<int>> followMap;
+
+public:
+    Twitter() {}
+
+    void postTweet(int userId, int tweetId) {
+        tweets[userId].push_back({time++, tweetId});
+    }
+
+    vector<int> getNewsFeed(int userId) {
+        vector<int> res;
+
+        // Min-heap: oldest tweet on top
+        priority_queue<
+            pair<int,int>,
+            vector<pair<int,int>>,
+            greater<pair<int,int>>
+        > pq;
+
+        // Own tweets
+        for (auto& t : tweets[userId]) {
+            pq.push(t);
+            if (pq.size() > 10) pq.pop();
+        }
+
+        // Followees' tweets
+        for (int f : followMap[userId]) {
+            for (auto& t : tweets[f]) {
+                pq.push(t);
+                if (pq.size() > 10) pq.pop();
+            }
+        }
+
+        // Extract tweets (oldest → newest)
+        while (!pq.empty()) {
+            res.push_back(pq.top().second);
+            pq.pop();
+        }
+
+        // Reverse to get newest → oldest
+        reverse(res.begin(), res.end());
+        return res;
+    }
+
+    void follow(int followerId, int followeeId) {
+        if (followerId != followeeId)
+            followMap[followerId].insert(followeeId);
+    }
+
     void unfollow(int followerId, int followeeId) {
         followMap[followerId].erase(followeeId);
     }
@@ -198,64 +271,65 @@ public:
 
 ---
 
-## Complexity Analysis
+## Why This Is Better
 
-### Time Complexity
-
-- `postTweet` → **O(1)**
-- `follow / unfollow` → **O(1)**
-- `getNewsFeed`:
-
-  - Push tweets into heap → `O(T log T)`
-  - Extract 10 tweets → `O(10 log T)`
-
-Where `T` = total tweets from user + followees.
+- Heap never grows beyond **10**
+- Old tweets are discarded immediately
+- Follow operations are **O(1)**
 
 ---
 
-### Space Complexity
+## Complexity (Optimized)
 
-- Tweets storage → **O(total tweets)**
-- Follow relationships → **O(total follows)**
-- Heap (temporary) → **O(T)**
+Let:
+
+- `F` = number of followees
+- `T` = tweets per user
+
+### Time
+
+```
+getNewsFeed → O((F × T) log 10) ≈ O(F × T)
+```
+
+### Space
+
+```
+O(10) heap + follow sets
+```
 
 ---
 
-## Common Mistakes (What NOT to Do)
+## Comparison
 
-❌ Storing only tweetId (no timestamp)
-❌ Allowing only one followee per user
-❌ Appending tweets instead of merging by time
-❌ Forgetting the “latest 10 only” rule
-❌ Not using a heap for ordering
+| Aspect          | Brute Force | Optimized |
+| --------------- | ----------- | --------- |
+| Heap size       | All tweets  | Max 10    |
+| Follow storage  | vector      | set       |
+| Time            | O(T log T)  | O(T)      |
+| Space           | O(T)        | O(1)      |
+| Interview ready | ❌          | ✅        |
 
 ---
 
 ## Final Mental Model (Lock This In)
 
-> **Design Twitter = merge sorted streams by time**
+> **Feed generation = merge by time + top-K selection**
 
-- Each user’s tweets are a sorted stream
-- News feed = merge all relevant streams
-- Heap gives most recent tweet efficiently
-- Return only top 10
+- Brute force → merge everything
+- Optimized → keep only what matters
 
 ---
 
-## Interview Tip
+## Final Recommendation
 
-If the interviewer asks:
-
-> “Why heap?”
-
-Answer:
-
-> “Because we need to merge tweets from multiple users by recency and return only the top 10 efficiently.”
-
-That’s the correct reasoning.
+- Start with **brute force** to understand correctness
+- Move to **optimized** for interviews & scale
+- Always ask:
+  👉 _“Do I really need all elements, or only top-K?”_
 
 ---
 
 ### One-Line Takeaway
 
-> **If a system asks for ‘latest K from many sources’, think heap + timestamp.**
+> **Correctness first, optimization second — but know both.**
