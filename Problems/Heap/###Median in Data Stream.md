@@ -1,242 +1,254 @@
-# 📌 Find Median from Data Stream
+# Find Median from Data Stream 
 
-This problem asks us to design a data structure that supports:
+## Problem Summary
 
-- `addNum(int num)` → insert a number into the data stream
-- `findMedian()` → return the median of all inserted numbers
+Design a data structure that supports:
 
-The data arrives **continuously**, so reprocessing the entire dataset repeatedly is inefficient.
+1. `addNum(int num)` → add a number from a stream
+2. `findMedian()` → return the median of all numbers so far
 
----
+### What is Median?
 
-## 🧠 Understanding Median
-
-- If total count is **odd** → middle element
-- If total count is **even** → average of two middle elements
-
-Median depends on **ordering**, not on sum or frequency.
+- If count is **odd** → middle element
+- If count is **even** → average of two middle elements
 
 ---
 
-## 1️⃣ Naive Approach (Sorting Every Time)
+## 🔑 Core Challenge
+
+The numbers arrive **one by one (stream)**.
+We must be able to:
+
+- Insert efficiently
+- Get median efficiently **at any time**
+
+---
+
+# 🟢 Solution 1 — Two Heaps (Optimal & Interview Standard)
+
+### Key Idea (THIS IS THE HEART)
+
+Split the numbers into **two halves**:
+
+- **Left part (max-heap)** → smaller half
+- **Right part (min-heap)** → larger half
+
+### Invariants (Always True)
+
+1. `leftPart.size()` and `rightPart.size()` differ by **at most 1**
+2. Every element in `leftPart` ≤ every element in `rightPart`
+
+If we maintain these, median is trivial.
+
+---
+
+## Why Two Heaps?
+
+| Heap             | Purpose                 |
+| ---------------- | ----------------------- |
+| Max-heap (left)  | Largest of smaller half |
+| Min-heap (right) | Smallest of larger half |
+
+Median is always at the **top(s)**.
+
+---
+
+## Code (Two Heaps) — with Short Comments
+
+```cpp
+class MedianFinder {
+private:
+    // Max-heap for left (smaller half)
+    priority_queue<int> leftPart;
+
+    // Min-heap for right (larger half)
+    priority_queue<int, vector<int>, greater<int>> rightPart;
+
+public:
+    MedianFinder() {}
+
+    void addNum(int num) {
+        // Step 1: always push into left heap
+        leftPart.push(num);
+
+        // Step 2: maintain ordering property
+        if (!rightPart.empty() && leftPart.top() > rightPart.top()) {
+            rightPart.push(leftPart.top());
+            leftPart.pop();
+        }
+
+        // Step 3: balance sizes
+        if (leftPart.size() > rightPart.size() + 1) {
+            rightPart.push(leftPart.top());
+            leftPart.pop();
+        }
+
+        if (rightPart.size() > leftPart.size() + 1) {
+            leftPart.push(rightPart.top());
+            rightPart.pop();
+        }
+    }
+
+    double findMedian() {
+        if (leftPart.size() == rightPart.size()) {
+            return (leftPart.top() + rightPart.top()) / 2.0;
+        }
+        return (leftPart.size() > rightPart.size())
+               ? leftPart.top()
+               : rightPart.top();
+    }
+};
+```
+
+---
+
+## Dry Run (Two Heaps)
+
+### Stream: `1, 5, 2, 10`
+
+#### Add 1
+
+```
+left = [1]
+right = []
+median = 1
+```
+
+#### Add 5
+
+```
+left = [1]
+right = [5]
+median = (1+5)/2 = 3
+```
+
+#### Add 2
+
+```
+left = [2,1]
+right = [5]
+median = 2
+```
+
+#### Add 10
+
+```
+left = [2,1]
+right = [5,10]
+median = (2+5)/2 = 3.5
+```
+
+---
+
+## Complexity (Two Heaps)
+
+```
+addNum   → O(log n)
+findMedian → O(1)
+Space → O(n)
+```
+
+✅ **Best possible for streaming**
+
+---
+
+# 🔵 Solution 2 — Sorting Every Time (Brute Force)
 
 ### Idea
 
-- Store all numbers in an array
-- Sort the array whenever `findMedian()` is called
-- Pick the middle element(s)
+- Store all numbers in a vector
+- Sort when median is needed
+- Pick middle element(s)
+
+### Simple but inefficient.
 
 ---
 
-### Pseudocode
+## Code (Brute Force)
 
-```
-addNum(x):
-    arr.push_back(x)
+```cpp
+class MedianFinder {
+private:
+    vector<int> data;
 
-findMedian():
-    sort(arr)
-    n = arr.size()
-    if n is odd:
-        return arr[n/2]
-    else:
-        return (arr[n/2 - 1] + arr[n/2]) / 2
-```
+public:
+    MedianFinder() {}
 
----
+    void addNum(int num) {
+        data.push_back(num);
+    }
 
-### Dry Run
+    double findMedian() {
+        sort(data.begin(), data.end());
+        int n = data.size();
 
-Input stream:
-
-```
-5 → 15 → 1 → 3
-```
-
-Stored array before median:
-
-```
-[5, 15, 1, 3]
-```
-
-After sorting:
-
-```
-[1, 3, 5, 15]
-```
-
-Median:
-
-```
-(3 + 5) / 2 = 4
+        if (n % 2 == 0) {
+            return (data[n/2] + data[n/2 - 1]) / 2.0;
+        } else {
+            return data[n/2];
+        }
+    }
+};
 ```
 
 ---
 
-### Complexity
+## Dry Run (Brute Force)
 
-- `addNum` → **O(1)**
-- `findMedian` → **O(N log N)** (sorting)
-- Space → **O(N)**
+### Stream: `1, 5, 2`
 
----
-
-### Why this fails
-
-- Sorting is repeated unnecessarily
-- Large input → Time Limit Exceeded (TLE)
-- Not suitable for streaming data
-
----
-
-## 2️⃣ Optimized Approach (Two Heaps – Streaming Median)
-
-### Core Idea
-
-Instead of sorting repeatedly, **maintain the data already split around the median**.
-
-We use two heaps:
-
-- **Max Heap (`smallHeap`)** → stores the smaller half of numbers
-- **Min Heap (`largeHeap`)** → stores the larger half of numbers
-
----
-
-### Heap Representation
+Stored data:
 
 ```
-smallHeap (max heap)      largeHeap (min heap)
-[ smaller numbers ] | [ larger numbers ]
-         ↑                     ↑
-   largest of left      smallest of right
+[1,5,2]
+→ sort → [1,2,5]
+median = 2
 ```
 
-The median always lies **between these two tops**.
+Works, but expensive.
 
 ---
 
-### Invariants (Must Always Hold)
-
-1. `smallHeap.top() ≤ largeHeap.top()`
-2. `| size(smallHeap) - size(largeHeap) | ≤ 1`
-
----
-
-### Algorithm
-
-#### addNum(num)
-
-1. Insert `num` into `smallHeap`
-2. If order breaks → move top from `smallHeap` to `largeHeap`
-3. If size difference > 1 → rebalance heaps
-
-Each operation costs at most `log N`.
-
----
-
-#### findMedian()
-
-- If both heaps have equal size → average of both tops
-- Otherwise → top of the larger heap
-
----
-
-## 🔍 Dry Run (Step-by-Step)
-
-### Input stream
+## Complexity (Brute Force)
 
 ```
-5, 15, 1, 3
+addNum   → O(1)
+findMedian → O(n log n)
+Space → O(n)
 ```
+
+❌ Too slow for large streams
 
 ---
 
-### Insert 5
+# 🆚 Comparison
 
-```
-smallHeap = [5]
-largeHeap = []
-median = 5
-```
-
----
-
-### Insert 15
-
-```
-smallHeap = [15, 5]
-→ rebalance
-
-smallHeap = [5]
-largeHeap = [15]
-
-median = (5 + 15) / 2 = 10
-```
+| Feature         | Two Heaps | Sort Every Time |
+| --------------- | --------- | --------------- |
+| addNum          | O(log n)  | O(1)            |
+| findMedian      | O(1)      | O(n log n)      |
+| Streaming       | ✅        | ❌              |
+| Interview-ready | ✅        | ❌              |
+| Optimal         | ✅        | ❌              |
 
 ---
 
-### Insert 1
+## 🧠 Mental Model (Lock This In)
 
-```
-smallHeap = [5, 1]
-largeHeap = [15]
-
-median = 5
-```
+> Median splits numbers into **left half** and **right half**
+> Heaps let you maintain this split dynamically.
 
 ---
 
-### Insert 3
+## 🔑 Final Takeaways
 
-```
-smallHeap = [5, 3, 1]
-→ rebalance
-
-smallHeap = [3, 1]
-largeHeap = [5, 15]
-
-median = (3 + 5) / 2 = 4
-```
+- Streaming + median → **Two heaps**
+- Keep heaps balanced
+- Median always at heap tops
+- Sorting approach is only for learning
 
 ---
 
-## ⏱️ Complexity Analysis
+### One-line Summary
 
-### Time Complexity
-
-- `addNum` → **O(log N)**
-- `findMedian` → **O(1)** ✅
-
-### Space Complexity
-
-- **O(N)**
-
----
-
-## 📊 Comparison Summary
-
-| Approach      | addNum   | findMedian | Suitable for Streaming |
-| ------------- | -------- | ---------- | ---------------------- |
-| Sorting-based | O(1)     | O(N log N) | ❌                     |
-| Two Heaps     | O(log N) | O(1)       | ✅                     |
-
----
-
-## 🧩 Key Insight
-
-> Don’t recompute order every time.
-> Maintain the median boundary as data arrives.
-
-This pattern is widely used in:
-
-- Real-time analytics
-- Sliding window median
-- Online statistics systems
-
----
-
-## 🏁 Conclusion
-
-The two-heap solution transforms median finding from a repeated sorting problem into a **controlled balancing problem**.
-
-Once the invariants are understood, the implementation becomes natural — and efficient enough for production-scale data streams.
+> **Two heaps maintain a dynamic sorted split of the stream, giving O(1) median retrieval.**
