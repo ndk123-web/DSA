@@ -9,7 +9,7 @@ plt.figure(figsize=(8,5))
 plt.plot(semesters, gpa, marker='o', linewidth=2, label="Semester GPA")
 plt.plot(semesters, cgpa, marker='s', linewidth=2, label="CGPA")
 
-plt.title("College Name – Academic Performance Trend | Navnath Kadam")
+plt.title("Vidyalankar Institute of Technology – Academic Performance Trend | Navnath Kadam")
 plt.xlabel("Semester")
 plt.ylabel("GPA")
 plt.ylim(8.8,10)
