@@ -221,3 +221,146 @@ Result list: O(E)
 Total: O(E)
 
 ---
+
+Perfect. We’ll extend the README properly and include the `vector + erase` approach with complexity discussion — like a clean LeetCode editorial.
+
+Below is the updated README section you can paste under your solution.
+
+---
+
+## Alternative Approach: Using `vector` Instead of `priority_queue`
+
+Instead of using a min-heap to maintain lexicographical order, we can use:
+
+```cpp
+unordered_map<string, vector<string>> adj;
+```
+
+### Key Idea
+
+* Store all destinations in a vector
+* Sort each adjacency list once
+* Always pick the smallest lexicographical destination
+* Remove the used edge
+* Apply the same postorder DFS (Hierholzer’s algorithm)
+
+---
+
+## Implementation (Vector + Erase)
+
+```cpp
+class Solution {
+private:
+    unordered_map<string, vector<string>> adj;
+    vector<string> res;
+
+    void dfs(string node) {
+        while (!adj[node].empty()) {
+            string next = adj[node].front();
+            adj[node].erase(adj[node].begin());  // consume ticket
+            dfs(next);
+        }
+        res.push_back(node);
+    }
+
+public:
+    vector<string> findItinerary(vector<vector<string>>& tickets) {
+
+        // Build adjacency list
+        for (auto& t : tickets) {
+            adj[t[0]].push_back(t[1]);
+        }
+
+        // Sort each list lexicographically
+        for (auto& [src, dests] : adj) {
+            sort(dests.begin(), dests.end());
+        }
+
+        dfs("JFK");
+
+        reverse(res.begin(), res.end());
+        return res;
+    }
+};
+```
+
+---
+
+## Why This Works
+
+This still follows **Hierholzer’s Algorithm**:
+
+1. Always use the smallest available edge.
+2. Remove the edge immediately after using it.
+3. Add node to result only when no outgoing edges remain.
+4. Reverse at the end.
+
+Even though both of these itineraries are valid:
+
+```
+["JFK","SEA","JFK","HOU","JFK"]
+["JFK","HOU","JFK","SEA","JFK"]
+```
+
+We must return the lexicographically smaller one.
+
+Since:
+
+```
+"HOU" < "SEA"
+```
+
+We must choose `"HOU"` first when starting from `"JFK"`.
+
+Sorting guarantees that.
+
+---
+
+## Complexity Analysis
+
+Let E = number of tickets
+
+### Priority Queue Approach
+
+* Insert edges: O(E log E)
+* Pop edges during DFS: O(E log E)
+* Total: O(E log E)
+
+### Vector + Erase Approach
+
+* Sorting adjacency lists: O(E log E)
+* Each erase from front: O(n)
+* In worst case, repeated shifting leads to O(E²)
+
+So:
+
+* `priority_queue` → more efficient for large input
+* `vector + erase` → simpler but potentially slower
+
+---
+
+## When to Use Which?
+
+If constraints are small → vector approach is fine.
+
+If constraints are large (like in real interviews or competitive programming) → prefer min-heap.
+
+Both are correct implementations of the same underlying algorithm:
+
+**Eulerian Path construction using postorder DFS.**
+
+---
+
+## Core Insight
+
+This problem is not about DFS alone.
+
+It is about:
+
+* Using every edge exactly once
+* Starting from a fixed node
+* Maintaining lexicographical order
+
+Which is a classic **Eulerian Path + Hierholzer’s Algorithm** pattern.
+
+Once that pattern is recognized, the rest is implementation detail.
