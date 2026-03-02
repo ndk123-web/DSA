@@ -1,55 +1,59 @@
-# ✅ Solution 1: Pure Recursion (Brute Force)
+# ✅ Solution 1: Normal Recursion (Brute Force)
 
 ## Intuition
 
-Har step par tum 1 ya 2 step le sakte ho.
-To reach step `n`, tum ya toh `n-1` se aaye hoge ya `n-2` se.
+To reach step `n`, you must have come from:
 
-Isliye recurrence ban gaya:
+- Step `n-1` (taking 1 step)
+- Step `n-2` (taking 2 steps)
+
+So the recurrence is:
 
 ```
 f(n) = f(n-1) + f(n-2)
 ```
 
-Ye Fibonacci jaisa lagta hai — aur hai bhi.
+This naturally forms a Fibonacci-like structure.
 
-Lekin yaha problem hai:
-Same subproblems baar baar calculate ho rahe hain.
+However, this approach recalculates the same subproblems multiple times.
 
 ---
 
 ## Approach
 
-- Base cases:
-  - `f(0) = 1`
+- Define base cases:
   - `f(1) = 1`
+  - `f(2) = 2`
 
-- Recursively call:
+- Recursively compute:
   - `f(n) = f(n-1) + f(n-2)`
 
 ---
 
 ## Complexity
 
-- Time complexity: **O(2^n)**
-  (Exponential, because of repeated subproblems)
-
-- Space complexity: **O(n)**
-  (Recursion stack)
+- Time Complexity: **O(2^n)** (exponential due to repeated calls)
+- Space Complexity: **O(n)** (recursion stack)
 
 ---
 
-## Code
+## Code (C++)
 
-```python
-class Solution:
-    def climbStairs(self, n: int) -> int:
-        def stair(n):
-            if n == 0 or n == 1:
-                return 1
-            return stair(n-1) + stair(n-2)
+```cpp
+class Solution {
+private:
+    int solve(int n) {
+        if (n == 1) return 1;
+        if (n == 2) return 2;
 
-        return stair(n)
+        return solve(n - 1) + solve(n - 2);
+    }
+
+public:
+    int climbStairs(int n) {
+        return solve(n);
+    }
+};
 ```
 
 ---
@@ -58,48 +62,61 @@ class Solution:
 
 ## Intuition
 
-Same recursion logic use karenge.
-But ek baar koi value calculate ho gayi, dobara calculate nahi karenge.
+The recursive solution recalculates the same values again and again.
 
-Overlapping subproblems ko store karenge.
+To optimize:
+
+- Store already computed results.
+- If the value exists, reuse it.
+
+This avoids overlapping subproblems.
 
 ---
 
 ## Approach
 
-- Use dictionary `memo`
-- Base:
-  - `memo = {0:1, 1:1}`
-
-- If value already computed → return from memo
-- Otherwise compute and store
+- Use an `unordered_map<int, int>` to store computed values.
+- Before computing `f(n)`, check if it already exists in `memo`.
+- If yes → return it.
+- Otherwise compute and store it.
 
 ---
 
 ## Complexity
 
-- Time complexity: **O(n)**
-  (Each state computed once)
-
-- Space complexity: **O(n)**
-  (Memo + recursion stack)
+- Time Complexity: **O(n)** (each state computed once)
+- Space Complexity: **O(n)** (memo + recursion stack)
 
 ---
 
-## Code
+## Code (C++)
 
-```python
-class Solution:
-    def climbStairs(self, n: int) -> int:
-        memo = {0: 1, 1: 1}
+```cpp
+#include <unordered_map>
+using namespace std;
 
-        def stair(n):
-            if n in memo:
-                return memo[n]
-            memo[n] = stair(n-1) + stair(n-2)
-            return memo[n]
+class Solution {
+private:
+    unordered_map<int, int> memo;
 
-        return stair(n)
+    int fibonacci(int n) {
+        if (n <= 0) return 1;
+        if (n == 1) return 1;
+        if (n == 2) return 2;
+
+        if (memo.find(n) != memo.end()) {
+            return memo[n];
+        }
+
+        memo[n] = fibonacci(n - 1) + fibonacci(n - 2);
+        return memo[n];
+    }
+
+public:
+    int climbStairs(int n) {
+        return fibonacci(n);
+    }
+};
 ```
 
 ---
@@ -108,114 +125,73 @@ class Solution:
 
 ## Intuition
 
-Recursion hata do.
-Hum jaante hain:
+Instead of going deep into recursion and coming back up,
+we build the solution from smaller values to larger values.
+
+Since:
 
 ```
 dp[i] = dp[i-1] + dp[i-2]
 ```
 
-Toh left se right build karenge.
+We compute from left to right.
 
 ---
 
 ## Approach
 
-- Create dp array of size n+1
-- Base:
-  - `dp[0] = 1`
-  - `dp[1] = 1`
+1. Create an array `dp` of size `n+1`.
+2. Initialize:
+   - `dp[0] = 1`
+   - `dp[1] = 1`
 
-- Loop from 2 to n
-- Fill dp
-
----
-
-## Complexity
-
-- Time complexity: **O(n)**
-- Space complexity: **O(n)**
-
----
-
-## Code
-
-```python
-class Solution:
-    def climbStairs(self, n: int) -> int:
-        if n == 0:
-            return 1
-
-        dp = [0] * (n + 1)
-        dp[0] = 1
-        dp[1] = 1
-
-        for i in range(2, n + 1):
-            dp[i] = dp[i-1] + dp[i-2]
-
-        return dp[n]
-```
-
----
-
-# ✅ Solution 4: Space Optimized DP
-
-## Intuition
-
-Notice karo:
-Har step par sirf last 2 values chahiye.
-
-Toh pura array rakhne ki zarurat nahi.
-
----
-
-## Approach
-
-Maintain two variables:
-
-- prev2 (dp[i-2])
-- prev1 (dp[i-1])
-
-Update iteratively.
+3. Fill the table using the recurrence.
+4. Return `dp[n]`.
 
 ---
 
 ## Complexity
 
-- Time complexity: **O(n)**
-- Space complexity: **O(1)**
+- Time Complexity: **O(n)**
+- Space Complexity: **O(n)**
 
 ---
 
-## Code
+## Code (C++)
 
-```python
-class Solution:
-    def climbStairs(self, n: int) -> int:
-        if n == 0:
-            return 1
+```cpp
+class Solution {
+public:
+    int climbStairs(int n) {
+        if (n == 0)
+            return 0;
+        if (n == 1)
+            return 1;
+        if (n == 2)
+            return 2;
 
-        prev2 = 1
-        prev1 = 1
+        int dp[n + 1];
 
-        for _ in range(2, n + 1):
-            curr = prev1 + prev2
-            prev2 = prev1
-            prev1 = curr
+        for (int i = 0; i <= n; i++) {
+            dp[i] = 0;
+        }
 
-        return prev1
+        dp[0] = 1;
+        dp[1] = 1;
+
+        for (int i = 2; i <= n; i++) {
+            dp[i] = dp[i - 1] + dp[i - 2];
+        }
+
+        return dp[n];
+    }
+};
 ```
 
 ---
 
-# Final Understanding
+# 🔥 What Type of DP Is Used?
 
-Climbing Stairs =
-Counting paths in a 1D linear graph.
-
-DP Type Used:
-
-- Solution 1 → No DP
-- Solution 2 → Top-Down DP
-- Solution 3 → Bottom-Up DP
-- Solution 4 → State Compression DP
+- Normal recursion → Not DP
+- Memoization → Top-Down DP
+- Tabulation → Bottom-Up DP
