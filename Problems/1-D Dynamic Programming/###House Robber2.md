@@ -1,124 +1,104 @@
 # Intuition
 
-In the original **House Robber** problem, houses are arranged in a straight line.
-We use the recurrence:
+In the classic **House Robber** problem, houses are arranged in a straight line and the recurrence is:
 
-```
+```id="mjlwmn"
 dp[i] = max(dp[i-1], nums[i] + dp[i-2])
 ```
 
-At each house we decide:
+But in **House Robber II**, houses are arranged in a **circle**, meaning:
 
-- **Skip it** → keep the best profit until the previous house.
-- **Rob it** → add current money and skip the previous house.
+- The **first and last houses are adjacent**
+- So they **cannot both be robbed**
 
-However, in **House Robber II**, the houses are arranged in a **circle**.
-This means the **first and last houses are adjacent**, so we cannot rob both.
+To handle this, we split the problem into two linear cases:
 
-Therefore, two scenarios must be considered:
-
-1. Rob houses from **index 0 to n-2** (exclude the last house)
-2. Rob houses from **index 1 to n-1** (exclude the first house)
-
-Each scenario becomes the **original linear House Robber problem**.
+1. Rob houses from **0 → n-2** (exclude the last house)
+2. Rob houses from **1 → n-1** (exclude the first house)
 
 The final answer is the maximum of these two cases.
 
 ---
 
-# Approach
+# Approach 1: Top-Down DP (Memoization)
 
-### Case 1 — Exclude the last house
+## Idea
 
-We compute the maximum robbery amount for houses:
+Define a recursive function:
 
-```
-[0 ... n-2]
-```
-
-DP initialization:
-
-```
-dp1[0] = nums[0]
-dp1[1] = max(nums[0], nums[1])
+```id="px3z9s"
+dfs(i) = maximum money we can rob starting from house i
 ```
 
-Transition:
+At each house we have two choices:
 
-```
-dp1[i] = max(dp1[i-1], dp1[i-2] + nums[i])
+- Skip the house → move to `i + 1`
+- Rob the house → move to `i + 2`
+
+Recurrence:
+
+```id="ux06n4"
+dfs(i) = max(
+    dfs(i+1),
+    nums[i] + dfs(i+2)
+)
 ```
 
-Loop until `n-2`.
+Memoization ensures each state is computed only once.
+
+Since the problem is circular, we solve two ranges separately:
+
+```id="f4nyjo"
+case1 = dfs(0 → n-2)
+case2 = dfs(1 → n-1)
+```
+
+Return the maximum.
 
 ---
 
-### Case 2 — Exclude the first house
-
-Now we compute for houses:
-
-```
-[1 ... n-1]
-```
-
-We shift the indexing for convenience.
-
-Initialization:
-
-```
-dp2[0] = nums[1]
-dp2[1] = max(nums[1], nums[2])
-```
-
-Transition:
-
-```
-dp2[i-1] = max(dp2[i-2], dp2[i-3] + nums[i])
-```
-
-Loop until the last house.
-
----
-
-### Final Result
-
-The optimal answer is:
-
-```
-max(dp1[n-2], dp2[n-2])
-```
-
-Because:
-
-- `dp1[n-2]` → best robbery excluding the last house
-- `dp2[n-2]` → best robbery excluding the first house
-
----
-
-# Complexity
+## Complexity
 
 Time Complexity:
 
-```
+```id="qj26yj"
 O(n)
 ```
 
-We iterate through the array twice.
+Each state is computed once.
 
 Space Complexity:
 
-```
+```id="z4x8zn"
 O(n)
 ```
 
-Two DP arrays are used.
+For recursion stack and memo storage.
 
 ---
 
-# Code
+## Code (Top-Down)
 
-```cpp
+```cpp id="1i6qxf"
 class Solution {
+private:
+    vector<int> memo;
+
+    int dfs(vector<int>& nums, int i, int n) {
+        if (i > n)
+            return 0;
+
+        if (memo[i] != -1)
+            return memo[i];
+
+        memo[i] = max(
+            dfs(nums, i + 1, n),
+            nums[i] + dfs(nums, i + 2, n)
+        );
+
+        return memo[i];
+    }
+
 public:
     int rob(vector<int>& nums) {
         int n = nums.size();
@@ -126,26 +106,91 @@ public:
         if (n == 1) return nums[0];
         if (n == 2) return max(nums[0], nums[1]);
 
-        int dp1[n];
-        int dp2[n];
+        memo.assign(n, -1);
+        int case1 = dfs(nums, 0, n - 2);
 
-        // Case 1: houses [0 ... n-2]
-        dp1[0] = nums[0];
-        dp1[1] = max(nums[0], nums[1]);
+        memo.assign(n, -1);
+        int case2 = dfs(nums, 1, n - 1);
 
-        for (int i = 2; i < n - 1; i++) {
-            dp1[i] = max(dp1[i - 1], dp1[i - 2] + nums[i]);
+        return max(case1, case2);
+    }
+};
+```
+
+---
+
+# Approach 2: Bottom-Up DP (Tabulation)
+
+## Idea
+
+We use the standard **House Robber recurrence**:
+
+```id="fhtyap"
+dp[i] = max(dp[i-1], nums[i] + dp[i-2])
+```
+
+But because of the circular constraint, we again solve two linear ranges:
+
+1. **0 → n-2**
+2. **1 → n-1**
+
+Then return the maximum result.
+
+---
+
+## State Definition
+
+```id="2ybz8s"
+dp[i] = maximum money that can be robbed from index 0 to i
+```
+
+---
+
+## Complexity
+
+Time Complexity:
+
+```id="j8vv0v"
+O(n)
+```
+
+Space Complexity:
+
+```id="2e4lnd"
+O(n)
+```
+
+---
+
+## Code (Bottom-Up)
+
+```cpp id="5ip8yx"
+class Solution {
+public:
+    int robLinear(vector<int>& nums, int start, int end) {
+        int n = end - start + 1;
+        vector<int> dp(n);
+
+        dp[0] = nums[start];
+        dp[1] = max(nums[start], nums[start + 1]);
+
+        for (int i = 2; i < n; i++) {
+            dp[i] = max(dp[i - 1], nums[start + i] + dp[i - 2]);
         }
 
-        // Case 2: houses [1 ... n-1]
-        dp2[0] = nums[1];
-        dp2[1] = max(nums[1], nums[2]);
+        return dp[n - 1];
+    }
 
-        for (int i = 3; i < n; i++) {
-            dp2[i-1] = max(dp2[i-2], dp2[i-3] + nums[i]);
-        }
+    int rob(vector<int>& nums) {
+        int n = nums.size();
 
-        return max(dp1[n - 2], dp2[n - 2]);
+        if (n == 1)
+            return nums[0];
+
+        return max(
+            robLinear(nums, 0, n - 2),
+            robLinear(nums, 1, n - 1)
+        );
     }
 };
 ```
@@ -154,7 +199,6 @@ public:
 
 # Key Insight
 
-The circular constraint only creates **one conflict**:
-the first and last house cannot both be robbed.
+The only complication in **House Robber II** is the circular arrangement.
 
-By splitting the problem into two linear robberies and taking the maximum result, we eliminate that conflict and reuse the original **House Robber DP pattern**.
+By splitting the problem into two independent linear robberies, we eliminate the adjacency conflict between the first and last houses and reuse the standard **House Robber dynamic programming strategy**.
