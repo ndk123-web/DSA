@@ -103,37 +103,51 @@ Used for memoization and recursion stack.
 ```cpp
 class Solution {
 private:
-    unordered_map<int,int> memo;
+    // it will store the min amount to make amount
+    unordered_map<int, int> memo;
 
-    int dfs(vector<int>& coins, int amount){
+    int dfs(vector<int>& coins, int amount) {
 
-        if(amount == 0)
+        // it means we found that to make amount X we need 1 (afterward when
+        // returns we automatically add 1 to it)
+        if (amount == 0) {
             return 0;
-
-        if(amount < 0)
-            return INT_MAX;
-
-        if(memo.count(amount))
-            return memo[amount];
-
-        int ans = INT_MAX;
-
-        for(int &coin : coins){
-
-            int res = dfs(coins, amount - coin);
-
-            if(res != INT_MAX)
-                ans = min(ans, res + 1);
         }
 
+        // it means its not possible to get amount with this amount
+        if (amount < 0) {
+            return INT_MAX;
+        }
+
+        // if to generate amount the minimum coins we need is already computed
+        // in memo if it presents then return it
+        if (memo.count(amount)) {
+            return memo[amount];
+        }
+
+        // for this amount initialize the minimum coins required is INT_MAX
+        int ans = INT_MAX;
+        for (int& coin : coins) {
+
+            // now res either INT_MAX / number
+            int res = dfs(coins, amount - coin);
+
+            // if its not INT_MAX then its not negative number
+            if (res != INT_MAX) {
+                ans = min(ans, res + 1);
+            }
+        }
+
+        // store the minimum coins to genearte amount
         return memo[amount] = ans;
     }
 
 public:
-    int coinChange(vector<int>& coins, int amount){
-
+    int coinChange(vector<int>& coins, int amount) {
         int res = dfs(coins, amount);
 
+        // still there is possibility that it returns INT_MAX that we not found
+        // any coins that sums to amount
         return res == INT_MAX ? -1 : res;
     }
 };
@@ -195,16 +209,20 @@ O(amount)
 class Solution {
 public:
     int coinChange(vector<int>& coins, int amount) {
-
+        int n = coins.size();
         vector<int> dp(amount + 1, INT_MAX);
 
+        // we know that to build amount 0 we need 0 coins
         dp[0] = 0;
 
-        for(int i = 1; i <= amount; i++){
+        for (int i = 1; i <= amount; i++) {
 
-            for(int coin : coins){
+            for (int coin : coins) {
+                
+                // if amount i - coin >= 0 as well as inside dp[i-coin] is MAX means we cant build amount (we are going sequentially)
+                if (i - coin >= 0 && dp[i - coin] != INT_MAX) {
 
-                if(i - coin >= 0 && dp[i - coin] != INT_MAX){
+                    // either dp[i] or 1 + previous coin 
                     dp[i] = min(dp[i], 1 + dp[i - coin]);
                 }
             }
