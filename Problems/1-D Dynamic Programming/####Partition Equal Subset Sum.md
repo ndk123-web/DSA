@@ -308,6 +308,199 @@ Where:
 target = totalSum / 2
 ```
 
+Good README already 👍. I’ll add the **third approach (Set / Reachable Sums method)** in the same LeetCode-style format so it fits naturally with the rest of your document.
+
+You can append this section after the DP approach.
+
+---
+
+# Approach 3 — HashSet (Track Reachable Subset Sums)
+
+## Idea
+
+Instead of using a DP array, we maintain a **set of all possible subset sums** that can be formed so far.
+
+At each number we **expand the reachable sums**.
+
+Example:
+
+If we currently can make sums:
+
+```
+{0,1,5}
+```
+
+and the next number is `3`, we generate new sums:
+
+```
+0+3 = 3
+1+3 = 4
+5+3 = 8
+```
+
+New reachable sums become:
+
+```
+{0,1,5,3,4,8}
+```
+
+If at any time the **target sum appears**, we can immediately return `true`.
+
+---
+
+# State Meaning
+
+```
+existing = set of reachable sums
+```
+
+Initially:
+
+```
+existing = {0}
+```
+
+Because we can always form sum `0` by selecting no elements.
+
+---
+
+# Transition
+
+For each number `num`:
+
+```
+newSums = {}
+
+for each sum s in existing:
+    newSums.add(s + num)
+
+existing = existing ∪ newSums
+```
+
+This simulates **choosing or skipping the number**.
+
+---
+
+# Example Dry Run
+
+```
+nums = [1,5,11,5]
+target = 11
+```
+
+Start:
+
+```
+existing = {0}
+```
+
+---
+
+After `1`:
+
+```
+new sums = {1}
+
+existing = {0,1}
+```
+
+---
+
+After `5`:
+
+```
+0+5 = 5
+1+5 = 6
+```
+
+```
+existing = {0,1,5,6}
+```
+
+---
+
+After `11`:
+
+```
+0+11 = 11
+1+11 = 12
+5+11 = 16
+6+11 = 17
+```
+
+```
+existing = {0,1,5,6,11,12,16,17}
+```
+
+Now:
+
+```
+11 exists
+```
+
+So partition is possible.
+
+Subset:
+
+```
+[11]
+```
+
+Other subset:
+
+```
+1 + 5 + 5 = 11
+```
+
+---
+
+# HashSet Code
+
+```cpp
+class Solution {
+public:
+    bool canPartition(vector<int>& nums) {
+
+        int total = accumulate(nums.begin(), nums.end(), 0);
+
+        if(total % 2 != 0)
+            return false;
+
+        int target = total / 2;
+
+        unordered_set<int> existing;
+        existing.insert(0);
+
+        for(int num : nums){
+
+            unordered_set<int> newGen = existing;
+
+            for(int s : existing){
+                newGen.insert(s + num);
+            }
+
+            if(newGen.count(target))
+                return true;
+
+            existing.insert(newGen.begin(), newGen.end());
+        }
+
+        return false;
+    }
+};
+```
+
+---
+
+# Complexity
+
+```
+Time Complexity  : O(n * target)
+Space Complexity : O(target)
+```
+
+The set may grow up to the target sum range.
+
 ---
 
 # Pattern Recognition
