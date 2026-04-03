@@ -103,6 +103,35 @@ void process() override { ... }
 
 ---
 
+## 6. `virtual` in Inheritance (Diamond Problem)
+**What:** `virtual` can also be used with inheritance to avoid duplicate Base class copies.
+**Why:** In diamond inheritance, without virtual inheritance, the final class gets two Base subobjects, causing ambiguity.
+**How:** Use `virtual` while inheriting from the common Base.
+
+### 📝 Logic & Concept
+`virtual` function and `virtual` inheritance are different uses of the same keyword.
+Here, `virtual` inheritance ensures only one shared instance of the common Base exists.
+
+### 💻 Example
+```cpp
+class A {
+public:
+    int x = 10;
+};
+
+class B : virtual public A {};
+class C : virtual public A {};
+
+class D : public B, public C {
+public:
+    void show() { cout << x << endl; } // No ambiguity
+};
+```
+* **Input:** `D d; d.show();`
+* **Output:** `10` (single shared `A` part).
+
+---
+
 ## 🏗️ Master Implementation (The "All-in-One" Code)
 
 ```cpp
