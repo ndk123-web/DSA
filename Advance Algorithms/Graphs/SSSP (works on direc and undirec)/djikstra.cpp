@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <string>
 #include <climits>
+#include <unordered_set>
 
 using namespace std;
 
@@ -31,6 +32,8 @@ public:
         // Adjacency List (src -> (weight, dest))
         unordered_map<int, vector<pair<int, int>>> adjList;
 
+        unordered_set<int> visited;
+
         // 1. Build Adjacency List
         for (auto &edge : edges)
         {
@@ -53,6 +56,13 @@ public:
             int dist = current.first;
             int node = current.second;
 
+            // it means we already fixed the minimum one
+            if (visited.find(node) != visited.end())
+            {
+                continue;
+            }
+
+            visited.insert(node);
             pq.pop();
 
             for (auto &edge : adjList[node])
@@ -77,7 +87,7 @@ int main()
     vector<vector<int>> edges = {
         {0, 1, 2},
         {0, 2, 5},
-        {1, 2, -10}};
+        {1, 2, 10}};
 
     Dijsktra dij("Ndk");
     auto v = dij.runDijkstra(edges, 0, 4);

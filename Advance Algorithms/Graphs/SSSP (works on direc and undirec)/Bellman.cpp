@@ -30,7 +30,6 @@ public:
         // Relax V - 1 times
         for (int i = 0; i < ITERATION; i++)
         {
-
             for (auto &edge : edges)
             {
                 int u = edge[0];
@@ -50,10 +49,13 @@ public:
 
 int main()
 {
+
+    // if we tweak the order then v-1 iterations will help us to get minimum weight
     vector<vector<int>> edges = {
+        {1, 2, -10},
         {0, 1, 2},
         {0, 2, 5},
-        {1, 2, -10}};
+    };
 
     BellmanFord *bell = new BellmanFord("ndk");
     vector<int> v = bell->runAlgo(edges, 0, 3);
