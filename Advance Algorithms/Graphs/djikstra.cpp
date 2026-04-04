@@ -23,9 +23,14 @@ public:
 
         // min heap
         priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> pq;
-        vector<int> distances(totalNodes, INT32_MAX);
+
+        // min distances with INT_MAX 
+        vector<int> distances(totalNodes, INT64_MAX);
+        
+        // Adjacency List (src -> (weight, dest))
         unordered_map<int, vector<pair<int, int>>> adjList;
 
+        // 1. Build Adjacency List 
         for (auto &edge : edges)
         {
             int u = edge[0];
@@ -35,14 +40,17 @@ public:
             adjList[u].push_back({w, v});
         }
 
+        // src dist = 0
         distances[src] = 0;
+        
+        // in min heap push the weight 0 with start node 
         pq.push({0, src});
 
         while (!pq.empty())
         {
-            pair<int,int> p = pq.top();
-            int dist = p.first;
-            int node = p.second;
+            pair<int, int> current = pq.top();
+            int dist = current.first;
+            int node = current.second;
 
             pq.pop();
 
