@@ -4,6 +4,7 @@
 #include <queue>
 #include <unordered_map>
 #include <string>
+#include <climits>
 
 using namespace std;
 
@@ -24,13 +25,13 @@ public:
         // min heap
         priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> pq;
 
-        // min distances with INT_MAX 
-        vector<int> distances(totalNodes, INT64_MAX);
-        
+        // min distances with INT_MAX
+        vector<int> distances(totalNodes, INT_MAX);
+
         // Adjacency List (src -> (weight, dest))
         unordered_map<int, vector<pair<int, int>>> adjList;
 
-        // 1. Build Adjacency List 
+        // 1. Build Adjacency List
         for (auto &edge : edges)
         {
             int u = edge[0];
@@ -42,8 +43,8 @@ public:
 
         // src dist = 0
         distances[src] = 0;
-        
-        // in min heap push the weight 0 with start node 
+
+        // in min heap push the weight 0 with start node
         pq.push({0, src});
 
         while (!pq.empty())
@@ -74,16 +75,15 @@ public:
 int main()
 {
     vector<vector<int>> edges = {
-        {0, 1, 1},
-        {0, 2, 4},
-        {0, 3, 5},
-        {1, 2, 1},
-        {2, 3, 1}};
+        {0, 1, 2},
+        {0, 2, 5},
+        {1, 2, -10}};
 
     Dijsktra dij("Ndk");
-    auto v = dij.runDijkstra(edges,0,4);
+    auto v = dij.runDijkstra(edges, 0, 4);
 
-    for (int i = 0 ; i < 4; i++) {
+    for (int i = 0; i < 4; i++)
+    {
         cout << i << "-> " << v[i] << endl;
     }
 
