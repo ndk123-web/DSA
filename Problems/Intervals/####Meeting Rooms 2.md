@@ -1,7 +1,3 @@
-Here is your **LeetCode-style README**, clean and to the point.
-
----
-
 # Meeting Rooms II
 
 ## Intuition
@@ -99,5 +95,3 @@ public:
 * Track active meetings using a min-heap of end times
 * Remove finished meetings before adding a new one
 * The peak number of active meetings determines the answer
-
-This is a classic **interval scheduling / sweep line pattern** problem.
