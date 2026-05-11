@@ -42,6 +42,9 @@ public:
             int w = edge[2];
 
             adjList[u].push_back({w, v});
+            
+            // for undirected graph
+            // adjList[v].push_back({w, u});
         }
 
         // src dist = 0
