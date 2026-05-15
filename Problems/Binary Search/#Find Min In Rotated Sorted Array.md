@@ -1,228 +1,180 @@
-# 🔁 Find Minimum in Rotated Sorted Array
+# Intuition
 
----
+In a rotated sorted array, one side of the array is always sorted.
 
-## 🔹 Problem Summary
+Example:
 
-You are given a **sorted array that has been rotated** at some pivot.
-
-Your task:
-
-> Return the **minimum element** in the array.
-
-Constraints guarantee:
-
-- All elements are **unique**
-- Array was originally sorted in ascending order
-- Rotation can be 0 or more times
-
----
-
-## 🔑 Key Understanding
-
-A rotated sorted array looks like:
-
-```
-[3,4,5,6,1,2]
+```txt id="jlwm0w"
+4 5 1 2 3
 ```
 
-It has:
+Here:
 
-- One **sorted part**
-- One **unsorted (rotated) part**
-- The **minimum element is the rotation point**
+```txt id="pjlwm7"
+4 5
+```
+
+is sorted and:
+
+```txt id="8jlwmr"
+1 2 3
+```
+
+is also sorted.
+
+The minimum element always lies near the rotation point.
+
+So during binary search:
+
+* if left side is sorted, then `nums[low]` can be a possible minimum
+* otherwise rotation exists on left side and `nums[mid]` can be minimum
+
+We keep shrinking the search space while updating the minimum answer.
 
 ---
 
-# ✅ Approach 1: Sorting (Brute Force)
+# Approach
+
+We use Binary Search.
+
+Initialize:
+
+```cpp id="x’wini1"
+low = 0
+high = n-1
+```
+
+At every step:
+
+```cpp id="yjlwm4"
+mid = low + (high-low)/2
+```
 
 ---
 
-## 🧠 Logic
+## Case 1
 
-- Sort the array
-- First element will be the minimum
+```cpp id="0jlwmy"
+nums[low] <= nums[mid]
+```
 
-This ignores the rotated property and treats it as a normal array.
+This means:
+
+```txt id="7’winin"
+left half is sorted
+```
+
+So:
+
+```txt id="2’wina5"
+nums[low]
+```
+
+is the minimum value of that sorted half.
+
+Update answer:
+
+```cpp id="sjlwmo"
+res = min(res, nums[low])
+```
+
+Since minimum cannot be inside this sorted portion anymore:
+
+```cpp id="q0gqz0"
+low = mid + 1
+```
 
 ---
 
-## 💻 Code
+## Case 2
+
+Otherwise:
+
+```txt id="mwo6rw"
+rotation exists in left half
+```
+
+and:
+
+```txt id="ahj9pp"
+nums[mid]
+```
+
+can be minimum.
+
+Update:
+
+```cpp id="uf9yxn"
+res = min(res, nums[mid])
+```
+
+Then continue searching left half:
+
+```cpp id="rzjdc7"
+high = mid
+```
+
+---
+
+# Complexity
+
+* Time complexity:
+
+```txt id="7o2qee"
+O(log n)
+```
+
+Because binary search removes half search space every iteration.
+
+---
+
+* Space complexity:
+
+```txt id="kfigjf"
+O(1)
+```
+
+No extra space used.
+
+---
+
+# Code
 
 ```cpp
 class Solution {
 public:
     int findMin(vector<int>& nums) {
-        sort(nums.begin(), nums.end());
-        return nums[0];
-    }
-};
-```
 
----
+        int low = 0;
+        int high = nums.size() - 1;
 
-## 🧪 Dry Run
+        if (nums.size() == 1)
+            return nums[0];
 
-```
-nums = [3,4,5,6,1,2]
-after sort → [1,2,3,4,5,6]
-return 1
-```
+        int res = 1e9;
 
----
+        while (low < high) {
 
-## ⏱ Complexity
+            int mid = low + (high - low) / 2;
 
-| Metric | Value           |
-| ------ | --------------- |
-| Time   | O(n log n) ❌   |
-| Space  | O(1) / O(log n) |
+            // left side sorted
+            if (nums[low] <= nums[mid]) {
 
----
+                res = min(res, nums[low]);
 
-## ❌ Drawback
-
-- Does not use the rotated-array property
-- Slower than required
-- Interviewers **do not prefer this**
-
----
-
-# ✅ Approach 2: Binary Search (Optimal)
-
----
-
-## 🧠 Core Concept
-
-At any time in a rotated sorted array:
-
-- One half is always **sorted**
-- The **minimum lies in the unsorted half**
-- Compare `nums[m]` with `nums[r]` to decide
-
-This allows **binary search on index space**.
-
----
-
-## 🔑 Key Rules
-
-- Search space always contains the minimum
-- Never discard a possible answer
-- Shrink range safely until one element remains
-
----
-
-## 💻 Code (Optimal)
-
-```cpp
-class Solution {
-public:
-    int findMin(vector<int>& nums) {
-        int l = 0;
-        int r = nums.size() - 1;
-
-        while (l < r) {
-            int m = l + (r - l) / 2;
-
-            // Minimum is strictly on the right side
-            if (nums[m] > nums[r]) {
-                l = m + 1;
+                low = mid + 1;
             }
-            // Minimum is at m or on the left side
+
+            // rotation exists in left side
             else {
-                r = m;
+
+                res = min(res, nums[mid]);
+
+                high = mid;
             }
         }
 
-        return nums[l];
+        return min(res, nums[low]);
     }
 };
 ```
-
----
-
-## 🧪 Proper Dry Run
-
-### Input
-
-```
-nums = [3,4,5,6,1,2]
-```
-
----
-
-### Step 1
-
-```
-l = 0, r = 5
-m = 2
-nums[m] = 5, nums[r] = 2
-5 > 2 → l = m + 1 = 3
-```
-
----
-
-### Step 2
-
-```
-l = 3, r = 5
-m = 4
-nums[m] = 1, nums[r] = 2
-1 <= 2 → r = m = 4
-```
-
----
-
-### Step 3
-
-```
-l = 3, r = 4
-m = 3
-nums[m] = 6, nums[r] = 1
-6 > 1 → l = m + 1 = 4
-```
-
----
-
-### End
-
-```
-l == r == 4
-nums[4] = 1 ✅
-```
-
----
-
-## ⏱ Complexity
-
-| Metric | Value       |
-| ------ | ----------- |
-| Time   | O(log n) ✅ |
-| Space  | O(1)        |
-
----
-
-## 🔍 Why `r = m` and not `m - 1`
-
-- `nums[m] <= nums[r]` means `m` **can be the minimum**
-- Removing `m` may discard the answer
-- So we **keep `m` in the search space**
-
-👉 Never remove a candidate unless you are **100% sure**
-
----
-
-## 🧠 Final Comparison
-
-| Approach      | Uses Rotation | Time       | Interview |
-| ------------- | ------------- | ---------- | --------- |
-| Sorting       | ❌ No         | O(n log n) | ❌        |
-| Binary Search | ✅ Yes        | O(log n)   | ✅        |
-
----
-
-## 🎯 One-Line Interview Explanation
-
-> “Since one half of a rotated sorted array is always sorted, we use binary search by comparing mid with the right boundary to locate the minimum in O(log n).”
-
----
