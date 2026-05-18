@@ -24,6 +24,7 @@
 6. Monotonic Stack 
    - Next Greater Element 
    - Next Smaller Element 2
+   - Next Greater Element 4 (2 stack approach)
   
 7. BFS
    - Jump Game 3
