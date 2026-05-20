@@ -34,8 +34,14 @@
    - Next Greater Element 
    - Next Smaller Element 2
    - Next Greater Element 4 (2 stack approach)
-  
-8.  BFS
+
+8. BFS
    - Jump Game 3
    - Jump Game 4 
+
+9. DP 
+   - Climbing Stairs
+   - House Robber 
+   - Longest Increasing Subsequence (DP)
+   - House Robber 2 (2 DP + Circular Array)
   
