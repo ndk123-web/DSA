@@ -38,10 +38,11 @@
 8. BFS
    - Jump Game 3
    - Jump Game 4 
+   - Number Of Islands
 
 9. DP 
    - Climbing Stairs
    - House Robber 
-   - Longest Increasing Subsequence (DP)
+   - Longest Increasing Subsequence (DP + lowerBound Approach)
    - House Robber 2 (2 DP + Circular Array)
   
