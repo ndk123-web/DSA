@@ -10,9 +10,10 @@
    - Longest Substring Without Repeating Characters
    - Minimum Window Substring
 
-3. Hashing Apporach
+3. HashMap and HashSet Approach
     - Two Sum
-    - 4 Sum
+    - Longest Consecutive Sequence
+    - Group Anagrams
    
 4. Recursion & Backtracking Approach
    - Letter Combinations of a Phone Number
@@ -22,6 +23,7 @@
 5. Binary search Approach   
    - Search in Rotated Sorted Array
    - Find Minimum in Rotated Sorted Array
+   - Koko Eating Bananas
   
 6. Sweep Line & Prefix Sum 
    - Range Sum Query
