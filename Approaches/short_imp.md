@@ -35,10 +35,10 @@
    - Next Smaller Element 2
    - Next Greater Element 4 (2 stack approach)
 
-8. BFS
-   - Jump Game 3
-   - Jump Game 4 
-   - Number Of Islands
+8. DFS & BFS
+   - Jump Game 3 (DFS + BFS)
+   - Jump Game 4 (BFS + DP)
+   - Number Of Islands (DFS + BFS)
 
 9. DP 
    - Climbing Stairs
@@ -46,3 +46,5 @@
    - Longest Increasing Subsequence (DP + lowerBound Approach)
    - House Robber 2 (2 DP + Circular Array)
   
+10.Trie
+   - Find the max len of longest common prefix
