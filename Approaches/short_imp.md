@@ -34,11 +34,13 @@
    - Next Greater Element 
    - Next Smaller Element 2
    - Next Greater Element 4 (2 stack approach)
+   - Online Stock Span 
 
 8. DFS & BFS
    - Jump Game 3 (DFS + BFS)
    - Jump Game 4 (BFS + DP)
    - Number Of Islands (DFS + BFS)
+   - Word Ladder (BFS)
 
 9. DP 
    - Climbing Stairs
