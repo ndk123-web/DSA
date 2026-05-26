@@ -31,8 +31,8 @@
    - Sub array sum equals k
 
 7. Monotonic Stack 
+   - Sum Of Subarray Minimums (Monotonic Stack + Prefix Sum)
    - Next Greater Element 
-   - Next Smaller Element 2
    - Next Greater Element 4 (2 stack approach)
    - Online Stock Span 
 
@@ -50,3 +50,6 @@
   
 10.Trie
    - Find the max len of longest common prefix
+
+11. Math
+    - Min Steps To Sort Permutation Array (Math + Circular Array) 
