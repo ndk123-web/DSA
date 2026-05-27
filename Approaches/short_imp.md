@@ -35,6 +35,7 @@
    - Next Greater Element 
    - Next Greater Element 4 (2 stack approach)
    - Online Stock Span 
+   - Max width Ramp (Monotonic Stack)
 
 8. DFS & BFS
    - Jump Game 3 (DFS + BFS)
