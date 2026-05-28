@@ -52,6 +52,7 @@
 10.Trie
    - Find the max len of longest common prefix
    - Longest Common Suffix (Reverse Trie)
+   - Longest Common Prefix 
 
 11. Math
     - Min Steps To Sort Permutation Array (Math + Circular Array) 
