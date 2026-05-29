@@ -60,3 +60,9 @@
 12. Union Set
     - Number Of Connected Components In An Undirected Graph (Union Set + DFS) 
     - Redundant Connection (Union Set + DFS) 
+    - Accounts Merge (Union Set)
+
+13. Heap
+    - Top K Frequent Elements (Heap + HashMap)
+    - Kth Largest Element In An Array (Heap)
+    - Merge K Sorted Lists (LL + Heap)
