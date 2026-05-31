@@ -14,7 +14,8 @@ struct SegmentNode {
     }
 
     ~SegmentNode() {
-        delete left, right;
+        delete left;
+        delete right;
     }
 };
 
