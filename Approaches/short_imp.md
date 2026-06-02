@@ -4,6 +4,7 @@
    - 3Sum
    - Valid Palindrome
    - Trapping Rain Water (2 pointer approach + prefix/suffix sum)
+   - Remove Duplicates from Sorted Array 2
 
 2. Sliding Window Approach
    - Max Average Subarray of Size K 
@@ -48,6 +49,7 @@
    - House Robber 
    - Longest Increasing Subsequence (DP + lowerBound Approach)
    - House Robber 2 (2 DP + Circular Array)
+   - Triangle (2D DP + Recursion + Memoization)
   
 10.Trie
    - Find the max len of longest common prefix
@@ -66,3 +68,6 @@
     - Top K Frequent Elements (Heap + HashMap)
     - Kth Largest Element In An Array (Heap)
     - Merge K Sorted Lists (LL + Heap)
+
+14. Greedy
+   - Earliest Finish Time for Land and Water
