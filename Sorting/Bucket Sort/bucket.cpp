@@ -54,6 +54,21 @@ int main() {
     long long minElement = *min_element(arr.begin(), arr.end());
     long long maxElement = *max_element(arr.begin(), arr.end());
     
+
+    /*
+        if we dont know each bucket size then ?
+        n = 10 means 9 holes are there
+        max =100, min=1
+        100-1=99 is range and holes = bucketSize 
+
+        we need 99 to store in 9 holes
+        99/9 = atleast 11 each bucket size need if size/hole = 9
+
+        here 11 each bucket size and 99 range 
+        99/11+1 = 10 
+        here 10 is the bucketCount that is actual buckets need overall
+    */
+
     int eachBucketSize = 10;
     int bucketCount = (maxElement - minElement) / (eachBucketSize + 1);
     bucketSort(arr, bucketCount);
