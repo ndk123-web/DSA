@@ -666,3 +666,59 @@ public:
     }
 };
 ```
+
+
+### Radix Sort
+```cpp
+class Solution {
+public:
+    void radixSort(vector<int>& nums) {
+        int n = nums.size();
+        int maxElement = *max_element(nums.begin(), nums.end());
+
+        for (long long exp = 1; maxElement / exp > 0; exp = exp * 10) {
+
+            vector<vector<int>> digits(10);
+
+            for (int i = 0; i < n; i++) {
+                int index = (nums[i] / exp) % 10;
+                digits[index].push_back(nums[i]);
+            }
+
+            vector<int> temp;
+            for (int k = 0; k < 10; k++) {
+                for (int& num : digits[k]) {
+                    temp.push_back(num);
+                }
+            }
+
+            nums = temp;
+        }
+
+        return;
+    }
+
+    int maximumGap(vector<int>& nums) {
+        int n = nums.size();
+
+        if (n < 2)
+            return 0;
+
+        if (*min_element(nums.begin(), nums.end()) ==
+            *max_element(nums.begin(), nums.end())) {
+            return 0;
+        }
+
+        radixSort(nums);
+
+        int res = INT_MIN;
+        for (int i = 0; i < n - 1; i++) {
+            res = max(res, (nums[i + 1] - nums[i]));
+        }
+
+        return res;
+    }
+};
+```
+- Time Complexity: O(n * k) where k is the number of digits in the largest number.
+- Space Complexity: O(n + k) where n is the number of elements in the input array and k is the number of digits in the largest number.
