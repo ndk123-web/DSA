@@ -58,6 +58,7 @@
 
 11. Math
     - Min Steps To Sort Permutation Array (Math + Circular Array) 
+    - Count Primes (Sieve of Eratosthenes)
   
 12. Union Set
     - Number Of Connected Components In An Undirected Graph (Union Set + DFS) 
