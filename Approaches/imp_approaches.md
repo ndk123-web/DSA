@@ -72,3 +72,9 @@
 
 14. Greedy
    - Earliest Finish Time for Land and Water
+
+15. Bit Manipulation
+    - Single Number
+    - Single Number 2
+    - Single Number 3 
+    - Counting Bits
