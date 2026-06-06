@@ -74,7 +74,7 @@
    - Earliest Finish Time for Land and Water
 
 15. Bit Manipulation
-    - Single Number
-    - Single Number 2
-    - Single Number 3 
+    - Single Number (normal xor)
+    - Single Number 2 (modulo counting)
+    - Single Number 3 (xor + grouping)
     - Counting Bits
