@@ -78,3 +78,7 @@
     - Single Number 2 (modulo counting)
     - Single Number 3 (xor + grouping)
     - Counting Bits
+
+16. Tree
+    - Kth Node Ancestor (Binary Lifting + DP)
+    
