@@ -4,7 +4,9 @@
 2. two sum 4 in BST 
 3. Partition List
 4. Compare Version Number
-5. Create Maxmium Number (2 pointer + Monotonic Stack)
-6. Circular Array Loop (Floyd's Cycle Detection (slow fast pointer) + index mapping (reverse & forward mod))
+* 5. Create Maxmium Number (2 pointer + Monotonic Stack)
+* 6. Circular Array Loop (Floyd's Cycle Detection (slow fast pointer) + index mapping (reverse & forward mod))
 7. Heaters (two pointer + binary search)
 8. Magical String (two pointer + string generation)
+* 9. Shortest Unsorted Continuous Subarray (two pointer + sorting (global minSeen maxSeen))
+* 10. Sum Of Square Numbers (two pointer + math)
