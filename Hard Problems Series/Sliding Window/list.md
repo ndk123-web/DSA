@@ -9,7 +9,11 @@
   
 * 6. Max Consecutive Ones III (Sliding Window + Atmost K Distinct Characters) - [LeetCode 1004](https://leetcode.com/problems/max-consecutive-ones-iii) ()
   
-* 7. Minimum Window Substring (Sliding Window + HashMap) - [LeetCode 76](https://leetcode.com/problems/minimum-window-substring/) ()
+* 7. Minimum Window Substring (Sliding Window + HashMap) - [LeetCode 76](https://leetcode.com/problems/minimum-window-substring/) 
 
 * 8. Subarray With K Different Integers (Sliding Window + HashMap) - [LeetCode 992](https://leetcode.com/problems/subarrays-with-k-different-integers/) (Trick=> Exactly K = Atmost K - Atmost K-1)
 * 9. Binary Subarrays With Sum (Sliding Window + HashMap) - [LeetCode 930](https://leetcode.com/problems/binary-subarrays-with-sum/) (Trick=> Exactly K = Atmost K - Atmost K-1)
+  
+* 10. Count Number of Nice Subarrays (Sliding Window + HashMap) - [LeetCode 1248](https://leetcode.com/problems/count-number-of-nice-subarrays/) (Trick=> Exactly K = Atmost K - Atmost K-1)
+
+* 11. Frequent Of the Most Frequent Element (Sliding Window + HashMap) - [LeetCode 1838](https://leetcode.com/problems/frequency-of-the-most-frequent-element/) (Trick => (targetSum * windowSize) - windowSum <= k)
