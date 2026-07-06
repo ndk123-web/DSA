@@ -17,3 +17,5 @@
 * 10. Count Number of Nice Subarrays (Sliding Window + HashMap) - [LeetCode 1248](https://leetcode.com/problems/count-number-of-nice-subarrays/) (Trick=> Exactly K = Atmost K - Atmost K-1)
 
 * 11. Frequent Of the Most Frequent Element (Sliding Window + HashMap) - [LeetCode 1838](https://leetcode.com/problems/frequency-of-the-most-frequent-element/) (Trick => (targetSum * windowSize) - windowSum <= k)
+
+* 12. Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit (Sliding Window + Deque) - [LeetCode 1438](https://leetcode.com/problems/longest-continuous-subarray-with-absolute-diff-less-than-or-equal-to-limit/) (Trick => Maintain a Deque for Max and Min , if max - min > limit then shrink the window from left)
