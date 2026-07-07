@@ -7,11 +7,13 @@
   - if previous prefix sum is exists then we need to add the count of that prefix sum count to the result
   - In Map we are storing the prefix sum and its count, (count means how many times that prefix sum has been seen so far in subarray)
   - Need (HashMap, and PrefixSum) to solve this problem
+  - Main Trick -> if we see the same prefix sum again then we can say that subarray sum from index (previous index + 1) to current index is equal to k
 
 * 2. Subarray Continous Sum (Prefix Sum + HashMap) - [LeetCode 523](https://leetcode.com/problems/continuous-subarray-sum/)
   - Trick -> Map storing prefix sum remainder with the index where it was seen
   - assume [23,2,4,6,7] k = 6, here remainder of prefx sum is [5, 1, 5, 5, 0] and we can see that remainder 5 is seen at index 0 and index 2, so we can say that subarray sum from index 1 to index 2 is divisible by k 
   - see assume current index at 2, current prefix sum is 29, remainder is 5, we can see that remainder 5 is seen at index 0, so we can say that subarray sum from index 1 to index 2 is divisible by k 
+  - Main Trick -> if we see the same remainder again then we can say that subarray sum from index (previous index + 1) to current index is divisible by k
 
 * 3. Minimum Lights to Illuminate a Street (Prefix Sum + Greedy + Difference Array) [LeetCode 605](https://leetcode.com/problems/can-place-flowers/)
    
