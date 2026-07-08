@@ -1,6 +1,6 @@
 ## Prefix Sum Lists
 
-* #[Foundation of Prefix Sum]
+### [PATTERN 1 - Foundation Of Prefix Sum --> (prev Prefix - current Prefix = subarray sum)]
 * 1. Subarray Sum Equals K (Prefix Sum + HashMap) - [LeetCode 560](https://leetcode.com/problems/subarray-sum-equals-k/)
   - Trick -> need to check is there previous prefix sum that is in map ? (map contains previous prefix sums of subarrays)
   - Best example: [1,-1,1,-1,1], k = 1, output = 6, dry run it 
@@ -9,6 +9,7 @@
   - Need (HashMap, and PrefixSum) to solve this problem
   - Main Trick -> if we see the same prefix sum again then we can say that subarray sum from index (previous index + 1) to current index is equal to k
 
+### [[PATTERN 2 - Prefix Sum + HashMap + Remainder Modulo]]
 * 2. Subarray Continous Sum (Prefix Sum + HashMap) - [LeetCode 523](https://leetcode.com/problems/continuous-subarray-sum/)
   - `If two prefix sums have the same remainder modulo k, then the subarray from (previous_index + 1) to current_index has a sum divisible by k.`
   - Trick -> Map storing prefix sum remainder with the index where it was seen
@@ -18,10 +19,64 @@
 * 3. Subarray Sum Divisible by K (Prefix Sum + HashMap) - [LeetCode 974](https://leetcode.com/problems/subarray-sums-divisible-by-k/)
   - Trick -> Map storing prefix sum remainder with the count of that remainder
   - `If two prefix sums have the same remainder modulo k, then the subarray from (previous_index + 1) to current_index has a sum divisible by k.`
+```cpp
+class Solution {
+public:
+    int subarraysDivByK(vector<int>& nums, int k) {
+        unordered_map<int, int> map;
+        int prefix = 0, n = nums.size();
+        int res = 0;
+
+        map[0] = 1;
+        for (int& num : nums) {
+            prefix += num;
+
+            if (map.count(((prefix % k) + k) % k)) {
+                res += map[((prefix % k) + k) % k];
+            }
+
+            map[((prefix % k) + k) % k]++;
+        }
+
+        return res;
+    }
+};
+```
   
+### [PATTERN 3 - Transformed Prefix Sum + HashMap + Convert 0 to -1 and 1 to 1]
 * 4. Contiguous Array (Prefix Sum + HashMap) - [LeetCode 525](https://leetcode.com/problems/contiguous-array/)
   - Trick -> Map storing prefix sum with the index where it was seen 
   - It becomes `longest subarrat with sum = 0`, `after converting 0 to -1 and 1 to 1`, we can say that if we see the same prefix sum again then we can say that subarray sum from index (previous index + 1) to current index is equal to 0
+```cpp
+class Solution {
+public:
+    int findMaxLength(vector<int>& nums) {
+        unordered_map<int, int> map;
+        map[0] = -1;
+
+        for (int i = 0; i < nums.size(); i++) {
+            if (nums[i] == 0)
+                nums[i] = -1;
+        }
+
+        int len = 0;
+        int prefix = 0;
+        for (int i = 0; i < nums.size(); i++) {
+            prefix += nums[i];
+
+            // prefix and prefix - 0 is same so, written prefix
+            if (map.count(prefix)) {
+                len = max(len, (i - map[prefix]));
+            }
+            else {
+                map[prefix] = i;
+            }
+        }
+
+        return len;
+    }
+};
+```
 
 
 * 3. Minimum Lights to Illuminate a Street (Prefix Sum + Greedy + Difference Array) [LeetCode 605](https://leetcode.com/problems/can-place-flowers/)
