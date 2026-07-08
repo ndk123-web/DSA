@@ -10,10 +10,19 @@
   - Main Trick -> if we see the same prefix sum again then we can say that subarray sum from index (previous index + 1) to current index is equal to k
 
 * 2. Subarray Continous Sum (Prefix Sum + HashMap) - [LeetCode 523](https://leetcode.com/problems/continuous-subarray-sum/)
+  - `If two prefix sums have the same remainder modulo k, then the subarray from (previous_index + 1) to current_index has a sum divisible by k.`
   - Trick -> Map storing prefix sum remainder with the index where it was seen
   - assume [23,2,4,6,7] k = 6, here remainder of prefx sum is [5, 1, 5, 5, 0] and we can see that remainder 5 is seen at index 0 and index 2, so we can say that subarray sum from index 1 to index 2 is divisible by k 
   - see assume current index at 2, current prefix sum is 29, remainder is 5, we can see that remainder 5 is seen at index 0, so we can say that subarray sum from index 1 to index 2 is divisible by k 
   - Main Trick -> if we see the same remainder again then we can say that subarray sum from index (previous index + 1) to current index is divisible by k
+* 3. Subarray Sum Divisible by K (Prefix Sum + HashMap) - [LeetCode 974](https://leetcode.com/problems/subarray-sums-divisible-by-k/)
+  - Trick -> Map storing prefix sum remainder with the count of that remainder
+  - `If two prefix sums have the same remainder modulo k, then the subarray from (previous_index + 1) to current_index has a sum divisible by k.`
+  
+* 4. Contiguous Array (Prefix Sum + HashMap) - [LeetCode 525](https://leetcode.com/problems/contiguous-array/)
+  - Trick -> Map storing prefix sum with the index where it was seen 
+  - It becomes `longest subarrat with sum = 0`, `after converting 0 to -1 and 1 to 1`, we can say that if we see the same prefix sum again then we can say that subarray sum from index (previous index + 1) to current index is equal to 0
+
 
 * 3. Minimum Lights to Illuminate a Street (Prefix Sum + Greedy + Difference Array) [LeetCode 605](https://leetcode.com/problems/can-place-flowers/)
    
