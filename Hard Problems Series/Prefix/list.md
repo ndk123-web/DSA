@@ -77,6 +77,63 @@ public:
     }
 };
 ```
+* 5. Binary Subarrays With Sum (Prefix Sum + HashMap) - [LeetCode 930](https://leetcode.com/problems/binary-subarrays-with-sum/)
+  - Trick -> Map storing prefix sum with the count of that prefix sum 
+  - if (prefix - goal) is exist means remove that prevous prefix sum from current prefix sum then we can say that subarray sum from index (previous index + 1) to current index is equal to goal
+```cpp
+class Solution {
+public:
+    int numSubarraysWithSum(vector<int>& nums, int goal) {
+        unordered_map<int, int> map;
+        int res = 0;
+        int prefix = 0;
+        map[0] = 1;
+
+        for (int i = 0; i < nums.size(); i++) {
+            prefix += nums[i];
+
+            if (map.count(prefix - goal))
+                res + = map[prefix - goal];
+
+            map[prefix]++;
+        }
+
+        return res;
+    }
+};
+```
+
+* 6. Count Number of Nice Subarrays (Prefix Sum + HashMap) - [LeetCode 1248](https://leetcode.com/problems/count-number-of-nice-subarrays/)
+  - transformed event -> 0, odd -> 1 
+  - Trick -> Map storing prefix sum with the count of that prefix sum
+  - and then same logic current_prefix - previous_prefix = k, if previous prefix sum is exists then we can say that subarray sum from index (previous index + 1) to current index is equal to k
+```cpp
+class Solution {
+public:
+    int numberOfSubarrays(vector<int>& nums, int k) {
+        int n = nums.size();
+
+        for (int i = 0; i < n; i++)
+            nums[i] = (nums[i] % 2 == 0) ? 0 : 1;
+
+        int prefix = 0;
+        int res = 0;
+        unordered_map<int, int> map;
+
+        map[0] = 1;
+        for (int i = 0; i < n; i++) {
+            prefix += nums[i];
+
+            if (map.count(prefix - k))
+                res += map[prefix - k];
+
+            map[prefix]++;
+        }
+
+        return res;
+    }
+};
+```
 
 
 * 3. Minimum Lights to Illuminate a Street (Prefix Sum + Greedy + Difference Array) [LeetCode 605](https://leetcode.com/problems/can-place-flowers/)
