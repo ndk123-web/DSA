@@ -135,6 +135,34 @@ public:
 };
 ```
 
+### [PATTERN 4 - Difference Sum] 
+* 7. Corporate Flight Bookings (Prefix Sum + Difference Array) - [LeetCode 1109](https://leetcode.com/problems/corporate-flight-bookings/)
+  - Trick -> Difference Array, we can say that if we want to add value to a range of indexes then we can add that value to the start index and subtract that value from the end index + 1, and then take prefix sum of that difference array to get the final result
+  - Dry run it with example [[1,2,10],[2,3,20],[2,5,25]], n = 5
+```cpp
+class Solution {
+public:
+    vector<int> corpFlightBookings(vector<vector<int>>& bookings, int n) {
+        vector<int> res(n, 0);
+
+        for (vector<int>& booking : bookings) {
+            int first = booking[0];
+            int last = booking[1];
+            int seats = booking[2];
+
+            res[first - 1] += seats;
+            if (last < n)
+                res[last] -= seats;
+        }
+
+        for (int i = 1; i < n; i++) {
+            res[i] += res[i - 1];
+        }
+
+        return res;
+    }
+};
+```
 
 * 3. Minimum Lights to Illuminate a Street (Prefix Sum + Greedy + Difference Array) [LeetCode 605](https://leetcode.com/problems/can-place-flowers/)
    
