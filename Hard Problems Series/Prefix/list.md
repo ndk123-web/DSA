@@ -135,7 +135,7 @@ public:
 };
 ```
 
-### [PATTERN 4 - Difference Sum] 
+### [PATTERN 4 - Difference Sum & Sweep Line] 
 * 7. Corporate Flight Bookings (Prefix Sum + Difference Array) - [LeetCode 1109](https://leetcode.com/problems/corporate-flight-bookings/)
   - Trick -> Difference Array, we can say that if we want to add value to a range of indexes then we can add that value to the start index and subtract that value from the end index + 1, and then take prefix sum of that difference array to get the final result
   - Dry run it with example [[1,2,10],[2,3,20],[2,5,25]], n = 5
@@ -160,6 +160,32 @@ public:
         }
 
         return res;
+    }
+};
+```
+
+* 8. Car Pooling 
+  - Trick -> difference sum 
+  - map<int,int> sorts pair according to key so its already sorted we can say
+```cpp
+class Solution {
+public:
+    bool carPooling(vector<vector<int>>& trips, int capacity) {
+        map<int, int> mapp;
+
+        for (auto& trip : trips) {
+            mapp[trip[1]] += trip[0];
+            mapp[trip[2]] -= trip[0];
+        }
+
+        int curr = 0;
+        for (auto& [st, passengers] : mapp) {
+            curr += passengers;
+            if (curr > capacity)
+                return false;
+        }
+
+        return true;
     }
 };
 ```
