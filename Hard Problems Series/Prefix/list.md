@@ -192,3 +192,5 @@ public:
 
 * 3. Minimum Lights to Illuminate a Street (Prefix Sum + Greedy + Difference Array) [LeetCode 605](https://leetcode.com/problems/can-place-flowers/)
    
+* 4. Count triplets that can form two arrays of equal sum (Prefix Sum + HashMap) - [LeetCode 1712](https://leetcode.com/problems/ways-to-split-array-into-three-subarrays/)
+  - Brute force -> O(n^2) and O(1) space 
