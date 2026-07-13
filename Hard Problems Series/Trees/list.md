@@ -109,3 +109,44 @@ public:
     bool isBalanced(TreeNode* root) { return forEachNode(root); }
 };
 ```
+
+### [Pattern-3 (Level Order Traversal)]
+* 1. Binary Tree Level Order Traversal [LeetCode 102](https://leetcode.com/problems/binary-tree-level-order-traversal/)
+```cpp
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        if (!root)
+            return {};
+            
+        queue<TreeNode*> q;
+        vector<vector<int>> res;
+        vector<int> part;
+
+        q.push(root);
+
+        while (!q.empty()) {
+            int size = q.size();
+
+            while (size--) {
+                TreeNode* t = q.front();
+
+                if (t)
+                    part.push_back(t->val);
+                
+                if (t && t->left != nullptr) 
+                    q.push(t->left);
+                if (t && t->right != nullptr)
+                    q.push(t->right);
+
+                q.pop();
+            }
+
+            res.push_back(part);
+            part.clear();
+        }
+
+        return res;
+    }
+};
+```
