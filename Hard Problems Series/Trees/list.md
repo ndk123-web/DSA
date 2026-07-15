@@ -249,3 +249,114 @@ public:
 };
 ```
 
+### [Pattern-5 (Binary Search Tree)]
+* 1. Search in a Binary Search Tree [LeetCode 700](https://leetcode.com/problems/search-in-a-binary-search-tree/)
+  - Trick -> if current node value is equal to target then return current node, if current node value is greater than target then go left else go right
+  - Time -> O(logN) if tree is balanced else O(N)
+```cpp
+class Solution {
+public:
+    TreeNode* search(TreeNode* node, int val) {
+        if (!node)
+            return nullptr;
+
+        if (node->val > val)
+            return search(node->left, val);
+        else if (node->val < val)
+            return search(node->right, val);
+        else if (node->val == val)
+            return node;
+
+        return nullptr;
+    }
+
+    TreeNode* searchBST(TreeNode* root, int val) { 
+        return search(root, val); 
+    }
+};
+```
+
+* 2. Validate Binary Search Tree [LeetCode 98](https://leetcode.com/problems/validate-binary-search-tree/)
+  - Trick -> create an arr, and push inside that inorder traversal of tree, then check if arr is sorted or not, if sorted then return true else false 
+  - Time -> O(N)
+  - Sol 1 - with extra space 
+```cpp
+class Solution {
+public:
+    vector<int> arr;
+
+    void generate(TreeNode* node) {
+        if (!node)
+            return;
+
+        generate(node->left);
+        arr.push_back(node->val);
+        generate(node->right);
+
+        return;
+    }
+
+    bool isValidBST(TreeNode* root) {
+        generate(root);
+
+        for (int i = 0; i < arr.size() - 1; i++) {
+            if (arr[i] >= arr[i + 1])
+                return false;
+        }
+
+        return true;
+    }
+};
+```
+
+  - Sol 2 - without using extra space 
+```cpp
+class Solution {
+public:
+    bool isValid(TreeNode* node, long long mn, long long mx) {
+        if (!node)
+            return true;
+
+        if (!(node->val > mn && node->val < mx))
+            return false;
+
+        return isValid(node->left, mn, node->val) &&
+               isValid(node->right, node->val, mx);
+    }
+
+    bool isValidBST(TreeNode* root) {
+        return isValid(root, LLONG_MIN, LLONG_MAX);
+    }
+};
+```
+
+* 3. Kth smallest element in a BST [LeetCode 230](https://leetcode.com/problems/kth-smallest-element-in-a-bst/)
+  - Trick -> do inorder traversal and keep track of count, when count == k then return the node value
+  - Time -> O(H + K) where H is the height of the tree, K is the kth smallest element
+```cpp
+class Solution {
+public:
+    vector<int> res;
+
+    void generate(TreeNode* node, int k) {
+        if (!node)
+            return;
+        
+        if (res.size() == k)
+            return;
+
+        generate(node->left, k);
+        res.push_back(node->val);
+        generate(node->right, k);
+    }
+
+    int kthSmallest(TreeNode* root, int k) {
+        generate(root, k);
+
+        if (k > res.size())
+            return -1;
+
+        return res[k - 1];
+    }
+};
+```
