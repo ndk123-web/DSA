@@ -150,3 +150,102 @@ public:
     }
 };
 ```
+
+* 2. Binary Tree Right Side View
+  - Trick -> use size of vector as current right side depth, 
+```cpp
+class Solution {
+public:
+    vector<int> res;
+
+    void viewRight(TreeNode* node, int depth) {
+        if (!node)
+            return;
+        
+        if (depth == res.size()) 
+            res.push_back(node->val);
+        
+        viewRight(node->right, depth+1);
+        viewRight(node->left, depth+1);
+    }
+
+    vector<int> rightSideView(TreeNode* root) {
+        viewRight(root, 0);
+        return res;
+    }
+};
+```
+
+### [Pattern-4 (Path Related)]
+* 1. Path Sum [LeetCode 112](https://leetcode.com/problems/path-sum/)
+  - Trick -> main condition will be if we reach leaf node and sum is equal to targetSum then return true, else return false 
+```cpp
+class Solution {
+public:
+    bool traverse(TreeNode* node, int targetSum, int currentSum) {
+        if (!node)
+            return false;
+
+        if ((currentSum + node->val) == (targetSum) && !node->left && !node->right)
+            return true;
+
+        return traverse(node->left, targetSum, currentSum + node->val) ||
+               traverse(node->right, targetSum, currentSum + node->val);
+    }
+
+    bool hasPathSum(TreeNode* root, int targetSum) {
+        return traverse(root, targetSum, 0);
+    }
+};
+```
+
+* 2. Path Sum III [LeetCode 437](https://leetcode.com/problems/path-sum-iii/)
+  - Trick -> For Each Node assume its a starting point and final currentSum from that node to all its child nodes, if currentSum == targetSum then increment the count, can use hashMap to store the currentSum instead of calculating it again and again
+```cpp
+class Solution {
+public:
+    int res = 0;
+
+    void findPaths(TreeNode* node, int targetSum, long long currentSum) {
+        if (!node)
+            return;
+
+        if (currentSum + node->val == targetSum)
+            res++;
+
+        findPaths(node->left, targetSum, currentSum + node->val);
+        findPaths(node->right, targetSum, currentSum + node->val);
+
+        return;
+    }
+
+    int pathSum(TreeNode* root, int targetSum) {
+        queue<TreeNode*> q;
+        q.push(root);
+
+        while (!q.empty()) {
+            int size = q.size();
+
+            while (size--) {
+                TreeNode* node = q.front();
+                q.pop();
+
+                // traverse each node to find targeSum 
+                // no matters targetSum or node->val is greater or smaller 
+                // because it contains both pos and neg numbers
+                if (node)
+                    findPaths(node, targetSum, 0);
+
+                if (node && node->left)
+                    q.push(node->left);
+
+                if (node && node->right)
+                    q.push(node->right);
+            }
+        }
+
+        return res;
+    }
+};
+```
+
