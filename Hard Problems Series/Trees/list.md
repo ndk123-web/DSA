@@ -249,6 +249,35 @@ public:
 };
 ```
 
+* 3. Maximum Path Sum [LeetCode 124](https://leetcode.com/problems/binary-tree-maximum-path-sum/)
+  - Trick -> for each node, find leftMax and rightMax, then update the res with max(res, leftMax + rightMax + node->val), return max(leftMax, rightMax) + node->val to parent node
+```cpp
+class Solution {
+public:
+    int res = 0;
+
+    int dfs(TreeNode* node) {
+        if (!node)
+            return 0;
+
+        // take max 0 
+        int leftMax = max(dfs(node->left), 0);
+        int rightMax = max(dfs(node->right), 0);
+
+        res = max(res, leftMax + rightMax + node->val);
+
+        // return 1 highest path (either left or right through)
+        return max(leftMax, rightMax) + node->val;
+    }
+
+    int maxPathSum(TreeNode* root) {
+        res = root->val;
+        dfs(root);
+        return res;
+    }
+};
+```
+
 ### [Pattern-5 (Binary Search Tree)]
 * 1. Search in a Binary Search Tree [LeetCode 700](https://leetcode.com/problems/search-in-a-binary-search-tree/)
   - Trick -> if current node value is equal to target then return current node, if current node value is greater than target then go left else go right
@@ -357,6 +386,40 @@ public:
             return -1;
 
         return res[k - 1];
+    }
+};
+```
+
+### [Pattern-6 (Building Tree)]
+* 1. Construct Binary Tree from Preorder and Inorder Traversal [LeetCode 105](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)
+  - Trick -> store inorder value positions in map, then idx = 0, for each root preorder[idx] find its position in inorder, then recursively call for left and right subtree
+  - All about obsevation, preorder -> root, left, right and inorder -> left, root, right 
+  - Time -> O(N)
+```cpp
+class Solution {
+public:
+    unordered_map<int, int> mapp;
+    int idx = 0;
+
+    TreeNode* dfs(vector<int>& preorder, int st, int end) {
+        if (st > end)
+            return nullptr;
+            
+        int rootVal = preorder[idx++];
+        TreeNode* node = new TreeNode(rootVal);
+
+        int rootIdx = mapp[rootVal];
+        node->left = dfs(preorder, st, rootIdx - 1);
+        node->right = dfs(preorder, rootIdx + 1, end);
+
+        return node;
+    }
+
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        for (int i = 0; i < preorder.size(); i++)
+            mapp[inorder[i]] = i;
+
+        return dfs(preorder, 0, preorder.size() - 1);
     }
 };
 ```
