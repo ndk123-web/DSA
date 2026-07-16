@@ -423,3 +423,43 @@ public:
     }
 };
 ```
+
+### [Pattern-7 (Lowest Common Ancestor)]
+* 1. Lowest Common Ancestor of a Binary Tree [LeetCode 236](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/)
+  - Trick -> if current node is equal to p or q then return current node, else recursively call for left and right subtree, if both left and right are not null then return current node else return left or right
+  - Time -> O(N)
+```cpp
+class Solution {
+public:
+    TreeNode *p, *q;
+
+    TreeNode* dfs(TreeNode* root) {
+        if (!root)
+            return nullptr;
+
+        // if its p / q return p/q
+        if (root == p || root == q)
+            return root;
+
+        TreeNode* left = dfs(root->left);
+        TreeNode* right = dfs(root->right);
+
+        // meaning root is LCS
+        if (left && right)
+            return root;
+
+        // meaning right is inside left subtree
+        if (left)
+            return left;
+
+        // meaning left is inside right subtree
+        return right;
+    }
+
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        this->p = p;
+        this->q = q;
+        return dfs(root);
+    }
+};
+```
