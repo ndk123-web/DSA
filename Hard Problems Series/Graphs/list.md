@@ -113,3 +113,91 @@ public:
     }
 };
 ```
+
+### [Pattern-3 Topological Sort (Kahn's Algorithm)]
+1. Course Schedule [Leetcode 207](https://leetcode.com/problems/course-schedule/)
+   - Trick: Use Kahn's algorithm for topological sorting. Count the number of nodes processed. If it equals the total number of courses, return true; otherwise, return false.
+   - Time -> O(V + E), Space -> O(V + E)
+```cpp
+class Solution {
+public:
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        vector<vector<int>> adj(numCourses);
+        vector<int> indegree(numCourses, 0);
+        queue<int> q;
+
+        for (auto& course : prerequisites) {
+            
+            // meaning we cant start with course[0] until we finish course[1], so we increase the indegree of course[0] and add course[0] to the adjacency list of course[1]
+            indegree[course[0]]++;
+
+            // meaning to further remove the dependency of course[0], we need to finish course[1] first, so we add course[0] to the adjacency list of course[1]
+            adj[course[1]].push_back(course[0]);
+        }
+
+        for (int i = 0; i < numCourses; i++) {
+            if (indegree[i] == 0)
+                q.push(i);
+        }
+
+        int finish = 0;
+        while (!q.empty()) {
+            int course = q.front();
+            q.pop();
+            finish++;
+
+            for (auto& nei : adj[course]) {
+                indegree[nei]--;
+                if (indegree[nei] == 0)
+                    q.push(nei);
+            }
+        }
+
+        return finish == numCourses;
+    }
+};
+```
+
+2. Course Schedule II [Leetcode 210](https://leetcode.com/problems/course-schedule-ii/)
+   - Trick: Similar to Course Schedule, but instead of just checking if it's possible to finish all courses, we need to return the order of courses. Use Kahn's algorithm and maintain a list of the order in which courses are completed.
+   - Time -> O(V + E), Space -> O(V + E)
+```cpp
+class Solution {
+public:
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+        vector<vector<int>> adj(numCourses);
+        vector<int> indegree(numCourses, 0);
+        queue<int> q;
+        vector<int> res;
+
+        for (auto& course : prerequisites) {
+            indegree[course[0]]++;
+            adj[course[1]].push_back(course[0]);
+        }
+
+        for (int i = 0; i < numCourses; i++) {
+            if (indegree[i] == 0)
+                q.push(i);
+        }
+
+        int finish = 0;
+        while (!q.empty()) {
+            int course = q.front();
+            q.pop();
+            finish++;
+            res.push_back(course);
+
+            for (auto& nei : adj[course]) {
+                indegree[nei]--;
+                if (indegree[nei] == 0)
+                    q.push(nei);
+            }
+        }
+
+        if (numCourses == finish)
+            return res;
+
+        return {};
+    }
+};
+```
