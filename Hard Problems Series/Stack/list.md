@@ -143,3 +143,32 @@ public:
     }
 };
 ```
+
+### [Pattern-4: Hard Stack Problems]
+1. Largest Rectangle in Histogram [Leetcode 84](https://leetcode.com/problems/largest-rectangle-in-histogram/)
+   - Trick: Use a stack to keep track of the indices of the histogram bars. For each bar, pop from the stack until you find a bar shorter than the current one, and calculate the area of the rectangle formed with the popped bar as the smallest bar.
+   - Time -> O(N), Space -> O(N)
+```cpp
+class Solution {
+public:
+    int largestRectangleArea(vector<int>& heights) {
+        stack<int> st;
+        int res = 0;
+        int n = heights.size();
+
+        for (int i = 0; i <= n; i++) {
+
+            while (!st.empty() && (i == n || heights[st.top()] > heights[i])) {
+                int h = heights[st.top()];
+                st.pop();
+                int w = (st.empty()) ? i : i - 1 - st.top();
+                res = max(res, (h * w));
+            }
+
+            st.push(i);
+        }
+
+        return res;
+    }
+};
+```
