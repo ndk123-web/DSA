@@ -136,3 +136,63 @@ public:
     }
 };
 ```
+
+4. Reverse Pairs [Leetcode 493](https://leetcode.com/problems/reverse-pairs/)
+   - Trick-> Use Merge Sort to count the reverse pairs, while merging we can count how many elements from right array are greater than 2 * current element from left array and add that count to the result for that index
+   - Assume L=[1,3,5] and R=[1,1,3] here for L[1]=3 j will be 2 , then when 3 < 2 * 3 then i moves to next index and j remains 2, so now we are at L[2] but cnt will be 2 because we have found 2 elements in R which are less than 2 * L[1] and now we are at L[2] so we need to add j to cnt now cnt = 2 and then we will check for L[2] and R[2] and so on
+```cpp
+class Solution {
+public:
+    int cnt = 0;
+
+    vector<int> mergeSort(vector<int>& L, vector<int>& R) {
+        int m = L.size(), n = R.size(), i = 0, j = 0;
+        vector<int> res;
+
+        while (i < m && j < n) {
+            if (L[i] > R[j])
+                res.push_back(R[j++]);
+            else
+                res.push_back(L[i++]);
+        }
+
+        while (i < m)
+            res.push_back(L[i++]);
+
+        while (j < n)
+            res.push_back(R[j++]);
+
+        return res;
+    }
+
+    vector<int> merge(vector<int>& nums, int l, int r) {
+        if (l > r)
+            return {};
+
+        if (l == r)
+            return {nums[l]};
+
+        int mid = l + (r - l) / 2;
+        vector<int> L = merge(nums, l, mid);
+        vector<int> R = merge(nums, mid + 1, r);
+
+        // since L and R are already sorted, now we need to handle cnt neatly
+        int j = 0;
+        for (int i = 0; i < L.size(); i++) {
+            while (j < R.size() && L[i] > (2LL * R[j]))
+                j++;
+
+            cnt += j;
+        }
+
+        return mergeSort(L, R);
+    }
+
+    int reversePairs(vector<int>& nums) {
+        int n = nums.size();
+
+        merge(nums, 0, n - 1);
+        return cnt;
+    }
+};
+```
