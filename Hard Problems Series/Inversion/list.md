@@ -196,3 +196,80 @@ public:
     }
 };
 ```
+
+1. Number of pairs satisfying an inequality [Leetcode 1801](https://leetcode.com/problems/number-of-pairs-satisfying-an-inequality/)
+   - 0 <= i < j <= n - 1 and nums1[i] - nums1[j] <= nums2[i] - nums2[j] + diff.
+   - Trick -> rewrite the inequality as nums1[i] - nums2[i] <= nums1[j] - nums2[j] + diff, meaning we can create like arr[i] = nums1[i] - nums2[i] that both sides of the inequality are in terms of arr[i] and arr[j] and then we can use merge sort to count the number of pairs satisfying the inequality 
+```cpp
+class Solution {
+public:
+    long long cnt = 0;
+
+    vector<int> mergeSort(vector<int>& L, vector<int>& R) {
+        int m = L.size(), n = R.size(), i = 0, j = 0;
+        vector<int> res;
+
+        while (i < m && j < n) {
+            if (L[i] < R[j]) {
+                res.push_back(L[i++]);
+            } else {
+                res.push_back(R[j++]);
+            }
+        }
+
+        while (i < m)
+            res.push_back(L[i++]);
+
+        while (j < n)
+            res.push_back(R[j++]);
+
+        return res;
+    }
+
+    vector<int> merge(vector<int>& arr, int l, int r, int diff) {
+        if (l > r)
+            return {};
+
+        if (l == r)
+            return {arr[l]};
+
+        int mid = l + (r - l) / 2;
+        vector<int> L = merge(arr, l, mid, diff);
+        vector<int> R = merge(arr, mid + 1, r, diff);
+
+        // arr = [1 0 4], diff = 1
+        int j = 0;
+        for (int i = 0; i < R.size(); i++) {
+            while (j < L.size() && R[i] >= L[j] - diff) {
+                j++;
+            }
+
+            cnt += j;
+        }
+
+        return mergeSort(L, R);
+    }
+
+    long long numberOfPairs(vector<int>& nums1, vector<int>& nums2, int diff) {
+        long long n = nums1.size();
+        vector<int> arr(n);
+
+        /*
+            nums1[i] - nums1[j] <= nums2[i] - nums2[j] + diff
+            nums1[i] - nums2[i] <= nums1[j] - nums2[j] + diff
+
+            arr[i] <= arr[j] + diff
+
+            nums1 = [3,2,5], nums2 = [2,2,1], diff = 1
+            arr = [1 0 4], diff = 1
+        */
+
+        for (int i = 0; i < n; i++) {
+            arr[i] = nums1[i] - nums2[i];
+        }
+
+        merge(arr, 0, n - 1, diff);
+        return cnt;
+    }
+};
+```  
