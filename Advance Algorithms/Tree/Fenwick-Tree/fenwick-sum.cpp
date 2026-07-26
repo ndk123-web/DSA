@@ -21,10 +21,17 @@ int fenwickAdd(vector<int> &arr)
     }
 }
 
-int update(int idx, int value)
+int update(vector<int> &nums, int idx, int value)
 {
     while (idx < fenwickTree.size())
     {
+        // diff 
+        long long diff = value - nums[idx];
+        
+        // change original value
+        nums[idx] = value;
+
+        idx++;
         fenwickTree[idx] += value;
 
         // go to next idx where we need to add value

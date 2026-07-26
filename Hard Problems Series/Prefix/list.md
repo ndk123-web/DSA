@@ -194,3 +194,141 @@ public:
    
 * 4. Count triplets that can form two arrays of equal sum (Prefix Sum + HashMap) - [LeetCode 1712](https://leetcode.com/problems/ways-to-split-array-into-three-subarrays/)
   - Brute force -> O(n^2) and O(1) space 
+
+### [Pattern 5- Segment Tree / Fenwick Tree / Binary Indexed Tree]
+1. Range Sum Query - Mutable (Segment Tree) - [LeetCode 307](https://leetcode.com/problems/range-sum-query-mutable/)
+   - Segment Tree is a binary tree where each node represents an interval or segment of the array. The root node represents the entire array, and each leaf node represents a single element of the array. Each internal node represents the sum of its child nodes.
+   - Segment Tree is used to answer range queries and update elements in logarithmic time.
+   - Time Complexity: O(log n) for both query and update operations.
+   - Space Complexity: O(n) for storing the segment tree.
+
+- [Segment Tree]
+```cpp
+class NumArray {
+public:
+    int N;
+    vector<long long> segment;
+    vector<int> nums;
+
+    NumArray(vector<int>& nums) {
+        N = nums.size();
+        segment.resize(4*N, 0);
+
+        this->nums = nums;
+
+        build(nums, 1, 0, N - 1);
+    }
+
+    void build(vector<int>& nums, int node, int l, int r) {
+        if (l == r) {
+            segment[node] = nums[l];
+            return;
+        }
+
+        int mid = l + (r - l) / 2;
+        build(nums, 2 * node, l, mid);
+        build(nums, 2 * node + 1, mid + 1, r);
+
+        segment[node] = segment[2 * node] + segment[2 * node + 1];
+        return;
+    }
+
+    void updateSeg(int l, int r, int node, int idx, int val) {
+        if (l == r) {
+            segment[node] = val;
+            return;
+        }
+
+        int mid = l + (r - l) / 2;
+
+        if (idx <= mid)
+            updateSeg(l, mid, node * 2, idx, val);
+
+        else
+            updateSeg(mid + 1, r, node * 2 + 1, idx, val);
+
+        segment[node] = segment[node * 2] + segment[node * 2 + 1];
+        return;
+    }
+
+    void update(int index, int val) { updateSeg(0, N - 1, 1, index, val); }
+
+    int query(int node, int l, int r, int ql, int qr) {
+        if (l > qr || r < ql)
+            return 0;
+
+        if (l >= ql && r <= qr)
+            return segment[node];
+
+        int mid = l + (r - l) / 2;
+        return query(node * 2, l, mid, ql, qr) +
+               query(node * 2 + 1, mid + 1, r, ql, qr);
+    }
+
+    int sumRange(int left, int right) {
+        return query(1, 0, N - 1, left, right);
+    }
+};
+```
+
+- [Fenwick Tree / Binary Indexed Tree]
+```cpp
+class NumArray {
+public:
+    vector<int> fenwick;
+    vector<int> nums;
+    int N = nums.size();
+
+    NumArray(vector<int>& nums) {
+        N = nums.size();
+        fenwick.resize(N + 1, 0);
+        this->nums = nums;
+
+        build();
+    }
+
+    void build() {
+        for (int i = 0; i < N; i++) {
+            int idx = i + 1;
+
+            while (idx <= N) {
+                fenwick[idx] += nums[i];
+                idx += (idx & -idx);
+            }
+        }
+    }
+
+    void updateFenwick(int idx, int val) {
+        long long diff = val - nums[idx];
+        nums[idx] = val;
+        
+        idx += 1;
+        while (idx <= N) {
+            fenwick[idx] += diff;
+            idx += (idx & -idx);
+        }
+    }
+
+    int query(int q) {
+        q+=1;
+        long long sum = 0;
+        while (q > 0) {
+            sum += fenwick[q];
+            q -= (q & -q);
+        }
+
+        return sum;
+    }
+
+    void update(int index, int val) {
+        updateFenwick(index, val);
+    }
+
+    int sumRange(int left, int right) {
+        if (left == 0)
+            return query(right);
+
+        return query(right) - query(left - 1);
+    }
+};
+```
