@@ -62,7 +62,7 @@ int update(int idx, int value, int l, int r, int node)
     else
         update(idx, value, mid + 1, r, node * 2 + 1);
 
-    segmentTree[node] = segmentTree[node * 2] + segmentTree[2 * node + 1];
+    segmentTree[node] = max(segmentTree[node * 2], segmentTree[2 * node + 1]);
 }
 
 int main()
