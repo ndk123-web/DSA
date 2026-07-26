@@ -46,8 +46,23 @@ int query(int node, int ql, int qr, int l, int r)
            query(node * 2 + 1, ql, qr, mid + 1, r);
 }
 
-int update(int node, int value) {
-    
+int update(int idx, int value, int l, int r, int node)
+{
+    if (l == r)
+    {
+        segmentTree[node] = value;
+        return;
+    }
+
+    int mid = l + (r - l) / 2;
+
+    if (idx <= mid)
+        update(idx, value, l, mid, node * 2);
+
+    else
+        update(idx, value, mid + 1, r, node * 2 + 1);
+
+    segmentTree[node] = segmentTree[node * 2] + segmentTree[2 * node + 1];
 }
 
 int main()

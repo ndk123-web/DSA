@@ -25,13 +25,15 @@ int update(vector<int> &nums, int idx, int value)
 {
     while (idx < fenwickTree.size())
     {
-        // diff 
+        // diff
         long long diff = value - nums[idx];
-        
+
         // change original value
         nums[idx] = value;
 
+        // if arr is 0 based
         idx++;
+
         fenwickTree[idx] += value;
 
         // go to next idx where we need to add value
@@ -41,6 +43,8 @@ int update(vector<int> &nums, int idx, int value)
 
 int query(int q)
 {
+    // if arr is 0 based
+    q++;
     int sum = 0;
     while (q > 0)
     {
