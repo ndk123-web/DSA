@@ -224,6 +224,7 @@ public:
 };
 ```
 
+### [Pattern-2 Compressed + Fenwick Tree]
 3. Inversion Count in an Array (LeetCode 315)
     - Trick-> Use Fenwick tree , rank the elements and then use log(n) time to count inversion and update the tree
     - we can also use merge sort though it will take O(nlogn) time and O(n) space 
@@ -277,6 +278,81 @@ public:
         }
 
         return res;
+    }
+};
+```
+
+4. Reverse Pairs (LeetCode 493)
+    - Trick-> Use Fenwick tree , rank the elements and then use log(n) time to count reverse pairs and update the tree
+    - we can also use merge sort though it will take O(nlogn) time and O(n) space 
+```cpp
+class Solution {
+public:
+    unordered_map<long long, int> mapp;
+    vector<long long> temp;
+    vector<int> fenwick;
+
+    int query(int q) {
+        long long sum = 0;
+        while (q > 0) {
+            sum += fenwick[q];
+            q -= (q & -q);
+        }
+        return sum;
+    }
+
+    void update(long long idx) {
+        while (idx < fenwick.size()) {
+            fenwick[idx]++;
+            idx += (idx & -idx);
+        }
+    }
+
+    int reversePairs(vector<int>& nums) {
+        /*
+            2 4 3 5 1
+
+            1. 2 4 3 5 1,  4 8 6 10 2
+            2. rank them after sorting
+            3.
+
+            Rank => 1 2 2 3 4 4 5 6 8 10
+                =>  1 2 3 4 5 6 7 8 9 10
+
+            fenwick => 0 0 1 0 0 0 0 0 0 0 0
+                    => 0 1 2 3 4 5 6 7 8 9 10
+
+            i = 1: rank = 2*1 = 2
+        */
+
+        // add num as well as 2*num to the temp array
+        for (int& num : nums) {
+            temp.push_back(num);
+            temp.push_back(num * 2LL);
+        }
+
+        // rank them
+        sort(temp.begin(), temp.end());
+        
+        // map the rank to the original number
+        for (int i = 0; i < temp.size(); i++)
+            mapp[temp[i]] = i + 1;
+
+        // resize the fenwick tree to the size of the temp array
+        fenwick.resize(temp.size() + 1, 0);
+        
+        int cnt = 0;
+        for (int i = nums.size() - 1; i >= 0; i--) {
+            int rank = mapp[nums[i]];
+
+            // count the number of elements less than 2*num in the fenwick tree
+            cnt += query(rank - 1);
+
+            // update the fenwick tree with the rank of 2*num
+            update(mapp[2LL * nums[i]]);
+        }
+
+        return cnt;
     }
 };
 ```
