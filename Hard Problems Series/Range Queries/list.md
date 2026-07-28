@@ -356,3 +356,64 @@ public:
     }
 };
 ```
+
+4.  Create Sorted Array through Instructions (LeetCode 1649)
+    - Trick-> Use Fenwick tree , rank the elements and then use log(n) time to count the number of elements less than and greater than the current element and update the tree
+    - we can also use merge sort though it will take O(nlogn) time and O(n) space
+```cpp
+class Solution {
+public:
+    unordered_map<int, int> mapp;
+    const long long MOD = 1e9 + 7;
+    vector<int> fenwick;
+    vector<int> temp;
+
+    int query(int idx) {
+        long long cnt = 0;
+        while (idx > 0) {
+            cnt += fenwick[idx];
+            idx = idx - (idx & -idx);
+        }
+        return cnt;
+    }
+
+    void update(int idx) {
+        while (idx <= temp.size()) {
+            fenwick[idx]++;
+            idx = idx + (idx & -idx);
+        }
+    }
+
+    int createSortedArray(vector<int>& instructions) {
+        int n = instructions.size();
+        temp = instructions;
+
+        fenwick.resize(n + 1, 0);
+
+        // rank it
+        sort(temp.begin(), temp.end());
+
+        // temp.erase(unique(temp.begin(),temp.end()),temp.end());
+
+        for (int i = 0; i < temp.size(); i++)
+            mapp[temp[i]] = i + 1;
+
+        long long res = 0;
+        for (int i = 0; i < n; i++) {
+            int rank = mapp[instructions[i]];
+
+            // find smaller ones according to current element
+            long long less = query(rank - 1);
+
+            // greater = total_inserted_till_now - (<= current_element) 
+            long long greater = i - query(rank);
+            
+            res += min(less, greater) % MOD;
+
+            update(rank);
+        }
+
+        return res % MOD;
+    }
+};
+```
