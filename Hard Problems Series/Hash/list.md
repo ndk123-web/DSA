@@ -61,3 +61,49 @@ public:
     }
 };
 ```
+
+### [Pattern 2: Lexicographical Order]
+1. Largest Number [leetcode](https://leetcode.com/problems/largest-number/)
+   - Trick -> sort the numbers in a custom way, if `a + b > b + a` then `a` should come before `b`.
+   - Take Care -> cpp concept sort , here that comaprator generrally means `a < b` means `a` should come before `b` in the sorted order, but here we are using `a + b > b + a` which means `a` should come before `b` if `a + b > b + a`.
+```cpp
+class Solution {
+public:
+    string largestNumber(vector<int>& nums) {
+
+        /*
+            a < b
+            i. 2 < 4 (true 2 comes first)
+            ii. 4 < 2 (false 2 comes first)
+            iii. 2 < 2 (false 2 comes (right one) first)
+
+            a > b
+            i. 2 > 4 (false 4 comes first)
+            ii. 4 > 2 (true 4 comes first)
+            iii. 2 > 2 (false 2 comes first (right one))
+        */
+
+        sort(nums.begin(), nums.end(), [](const int& a, const int& b) {
+            return (to_string(a) + to_string(b)) >
+                   (to_string(b) + to_string(a));
+        });
+
+        string s = "";
+        for (int i = 0; i < nums.size(); i++) {
+            if (s + to_string(nums[i]) > to_string(nums[i]) + s) {
+                s += to_string(nums[i]);
+            } else {
+                s = to_string(nums[i]) + s;
+            }
+        }
+
+        int cnt = 0;
+        for (int i = 0; i < s.size(); i++) {
+            if (s[i] == '0')
+                cnt++;
+        }
+
+        return (cnt == s.size()) ? "0" : s;
+    }
+};
+```
