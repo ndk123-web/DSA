@@ -66,6 +66,8 @@ public:
 1. Largest Number [leetcode](https://leetcode.com/problems/largest-number/)
    - Trick -> sort the numbers in a custom way, if `a + b > b + a` then `a` should come before `b`.
    - Take Care -> cpp concept sort , here that comaprator generrally means `a < b` means `a` should come before `b` in the sorted order, but here we are using `a + b > b + a` which means `a` should come before `b` if `a + b > b + a`.
+  
+i. Solution-1 using custom comparator and sorting mechanism
 ```cpp
 class Solution {
 public:
@@ -104,6 +106,45 @@ public:
         }
 
         return (cnt == s.size()) ? "0" : s;
+    }
+};
+```
+
+ii. Solution-2 without using custom comparator and sorting mechanism 
+- Trick -> use DFS to generate the numbers in lexicographical order. 
+```cpp
+class Solution {
+public:
+    void dfs(vector<int>& nums, int startDigit, int n) {
+
+        if (startDigit > n)
+            return;
+
+        for (int digit = 0; digit <= 9; digit++) {
+            int next = startDigit * 10;
+
+            if (next + digit > n)   
+                return;
+            
+            nums.push_back(next + digit);
+            dfs(nums, (next + digit), n);
+        }
+
+        return;
+    }
+
+    vector<int> lexicalOrder(int n) {
+        vector<int> nums;
+
+        for (int i = 0; i < 9; i++) {
+            if (i + 1 > n) 
+                break;
+
+            nums.push_back(i+1);
+            dfs(nums, i + 1, n);
+        }
+
+        return nums;
     }
 };
 ```
