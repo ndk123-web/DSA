@@ -133,3 +133,54 @@ public:
     }
 };
 ```
+
+### [Pattern 2: Advanced]
+1. Permutation Sequence (given n and k, find the kth permutation sequence)
+   - Trick -> use DFS , find (n-1)! to find first digit, put first digit then update k, thhen again till n == 0, and then return the result.
+```cpp
+class Solution {
+public:
+    string res = "";
+
+    /*
+        1. find each digit block size (n-1)!
+        2. find digit
+        3. update used vector
+        4. update k and n
+        5. recurse
+    */
+    int fact(int n) {
+        if (n <= 0)
+            return 1;
+
+        return n * fact(n - 1);
+    }
+
+    void dfs(int n, int k) {
+        if (n == 0)
+            return;
+
+        int block = fact(n - 1);
+
+        int idx = (k / block);
+
+        res += to_string(availbale[idx]);
+        availbale.erase(availbale.begin() + idx);
+
+        n--;
+        k %= block;
+
+        dfs(n, k);
+    }
+
+    vector<int> availbale;
+    string getPermutation(int n, int k) {
+        for (int i = 0; i < n; i++)
+            availbale.push_back(i + 1);
+
+        k--;
+        dfs(n, k);
+        return res;
+    }
+};
+```
