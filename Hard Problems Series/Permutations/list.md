@@ -140,6 +140,7 @@ public:
 ```cpp
 class Solution {
 public:
+    vector<int> availbale;
     string res = "";
 
     /*
@@ -160,26 +161,93 @@ public:
         if (n == 0)
             return;
 
+        // in each n digit has block size f(n-1)
         int block = fact(n - 1);
 
+        // get 0 based index 
         int idx = (k / block);
 
+        // stored 0 based index value in avalibale 
         res += to_string(availbale[idx]);
+
+        // erase so that we dont have to take same used value in next recursion
         availbale.erase(availbale.begin() + idx);
 
+        // reduce n 
         n--;
-        k %= block;
 
+        // remaining size 
+        k -= (block * idx);
+
+        // recurse
         dfs(n, k);
     }
 
-    vector<int> availbale;
     string getPermutation(int n, int k) {
         for (int i = 0; i < n; i++)
             availbale.push_back(i + 1);
 
+        // for to be 0 based used k--
         k--;
         dfs(n, k);
+        return res;
+    }
+};
+```
+
+2. Letter Case Permutation
+    - Trick -> use DFS to generate all permutations of the given string.
+    - Call if small letter then call dfs with small and big letter, if big letter then call dfs with big and small letter, if number then skip.
+```cpp
+class Solution {
+public:
+    vector<string> res;
+
+    /*
+        1. if s[idx] is number skip
+        2. if s[idx] is letter 2 dfs (smallest, biggest)
+        3. if idx == s.size() thats our answer
+    */
+    void dfs(string& s, int idx) {
+        if (idx == s.size()) {
+            res.push_back(s);
+            return;
+        }
+
+        if (s[idx] - '0' >= 0 && s[idx] - '0' <= 9) {
+            dfs(s, idx + 1);
+            return;
+        }
+
+        // small
+        if (s[idx] >= 'a' && s[idx] <= 'z') {
+            dfs(s, idx + 1);
+
+            char prev = s[idx];
+            s[idx] = s[idx] - 32;
+            dfs(s, idx + 1);
+            
+            // backtrack
+            s[idx] = prev;
+        }
+
+        // big
+        else {
+            dfs(s, idx + 1);
+            
+            char prev = s[idx];
+            s[idx] = s[idx] + 32;
+            
+            dfs(s, idx + 1);
+
+            // backtrack
+            s[idx] = prev;
+        }
+        return;
+    }
+
+    vector<string> letterCasePermutation(string s) {
+        dfs(s, 0);
         return res;
     }
 };
