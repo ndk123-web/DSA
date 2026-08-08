@@ -1,6 +1,6 @@
 ## Knapsack Problems 
 
-### Types of Knapsack Problems 
+### Types of Knapsack Problems (1. 0/1 Knapsack Problem)
 1. Target Sum Problem [leetcode](https://leetcode.com/problems/target-sum/)
    - Trick -> Count the number of ways to assign + and - signs to make the sum equal to target, used `dp` to store the number of ways to reach a certain sum at a certain index.
 ```cpp
@@ -69,6 +69,34 @@ public:
         }
 
         return dp[target];
+    }
+};
+```
+
+### Types of Knapsack Problems (2. Unbounded Knapsack Problem)
+1. Coin change problem [leetcode](https://leetcode.com/problems/coin-change/)
+   - Trick -> use dp,
+        - calculate `1 to amount`, for each coin check if we can make the amount using that coin, if yes then take the minimum of current value and `1 + dp[amount - coin]` 
+```cpp
+class Solution {
+public:
+    int coinChange(vector<int>& coins, int amount) {
+        vector<int> dp(amount + 1, INT_MAX);
+
+        dp[0] = 0;
+
+        for (int tryAmount = 1; tryAmount <= amount; tryAmount++) {
+
+            for (int& coin : coins) {
+
+                if (tryAmount - coin >= 0 && dp[tryAmount - coin] != INT_MAX) {
+                    dp[tryAmount] =
+                        min(dp[tryAmount], dp[tryAmount - coin] + 1);
+                }
+            }
+        }
+
+        return dp[amount] == INT_MAX ? -1 : dp[amount];
     }
 };
 ```
