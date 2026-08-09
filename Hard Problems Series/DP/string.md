@@ -25,3 +25,49 @@ public:
     }
 };
 ```
+
+2. Longest Palindrome Substring 
+   - Trick -> use 2d DP, where `dp[i][j]` will represent whether the substring `s[i..j]` is a palindrome or not. If it is a palindrome then we can check if the length of that substring is greater than the current max length and update accordingly.
+```cpp
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        int n = s.size();
+        int st = 0;
+        int maxLen = 1;
+
+        vector<vector<bool>> dp(n, vector<bool>(n, false));
+
+        // all diagonals are one of the answers
+        // it covers length 1 palidrome substrings
+        for (int i = 0; i < n; i++) {
+            dp[i][i] = true;
+        }
+
+        /*
+            assume, "aabaa"
+            at len = 5, in (st = a, end = 1) we will check whether (aba) is palidrome
+        */
+
+        // now check for len = 2 to n 
+        for (int len = 2; len <= n; len++) {
+            for (int i = 0; i <= n - len; i++) {
+                int j = i + len - 1;
+                
+                if (s[i] == s[j]) {
+                    if (len == 2 || dp[i + 1][j - 1]) {
+                        dp[i][j] = true;
+
+                        if (len > maxLen) {
+                            maxLen = len;
+                            st = i;
+                        }
+                    }
+                }
+            }
+        }
+
+        return s.substr(st, maxLen);
+    }
+};
+``` 
