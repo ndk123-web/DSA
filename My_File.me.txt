@@ -1,0 +1,126 @@
+1. CMD -> 
+    - ndk.BAT (saved on system32)
+    - make call from cmd -> ndk mode1/model2 it will give some random list but that are ML model
+    - model1 -> LogisticRegression , model2 -> MultiBay Model 
+    - EX : - ndk model1 
+
+    - ndk_java.BAT (saved on system32)
+    - make call from cmd -> ndk_java arg it will give some random list but that are ML model
+    - EX : - It will give u permutations of ABC 
+
+2. TCP and web Socket->
+    - It can be normal connection on Can work as web socket 
+    - All are Handles by the server 
+    - event and it store in map and there in (emit and on) 
+    - check chatOrbit there better example of socket
+
+3. What is google Collab, JupyterLab, and vscode ipynb
+	- google collabs: Google Colab provides a browser-based notebook interface where the backend environment and kernel are managed by Google.
+	- vscode ipynb: VS Code uses the Jupyter extension to run notebooks locally using the selected environment’s ipykernel.
+	- jupyterlab: it is a browser-based interface that runs on a local server and executes code through the ipykernel of a selected environment.
+
+4. Whenever we run python file.py first it checks the libraries used in file.py in sys.path so always use python -m command from root directory so that it wont give the error
+
+5. GCP
+    - API Key → "this is my app"
+    - OAuth → "user allowed me"
+    - Service Account → "I am the server"
+
+6. Threads and Processes 
+    - Threads are execute function on different core or concurrently switches 
+
+7. Github Scenarios 
+    - Basic Details:
+        a. git add . -> (working to staged)
+        b. git commit -m "" -> (staged to local repository)
+        c. git push origin main -> (local repository to remote repository)
+        d. git pull origin main -> (fetch + merge to the local repository)
+        e. git fetch origin main -> (only see what new commits added to particular branch)
+        f. git merge origin feature/branch -> (merge feature/branch with main)  
+        g. git checkout -b new/branch -> (create new branch in local repo)
+        i. git switch branch -> (switch existed branch)
+        j. git rebase remote_branch -> (apply local current branch apply on top of remote_branch)
+        k. git stash (current branch's uncommited chnages saved in the stash, and can do other branch work)
+        l. git stash pop (get the changes from stash and delete from stash)
+        m. git stash apply (get the changes from stash and keep the stash)
+
+    i. git add . 
+        - oops need not to add 
+        - git restore --staged file_path 
+        - back from staged to working directory
+    
+    ii. git add . & git commit -m "feat: something"
+        - oops need not to be commit 
+        - git reset --soft HEAD~1 
+        - means go 1 commit back (--soft means only remove commit , keep staging and working as it is)
+        - (--soft, --mixed, --hard)
+
+8. JWT (JSON Web Token)
+- JWT has 3 parts separated by dots:
+  - Header
+  - Payload (Base64 encoded, NOT encrypted, anyone can decode)
+  - Signature
+
+- Purpose of Signature:
+  - Ensures the Header and Payload have not been modified.
+  - Proves who issued the JWT.
+
+----------------------------------------------------
+
+i. Symmetric JWT (HS256)
+
+- Uses ONE shared Secret Key.
+- The same Secret Key is used to:
+    1. Sign (create) the JWT
+    2. Verify the JWT
+- Best when the same backend both creates and verifies the token.
+- Example:
+    - Your Rust Backend
+    - Access Tokens
+    - Refresh Tokens
+
+----------------------------------------------------
+
+ii. Asymmetric JWT (RS256)
+
+- Uses TWO keys:
+    - Private Key
+    - Public Key
+
+- Private Key
+    - Used ONLY to sign the JWT.
+    - Never shared.
+
+- Public Key
+    - Shared publicly.
+    - Used ONLY to verify the JWT signature.
+    - Cannot create/sign new JWTs.
+
+- Firebase / Google Flow
+
+    Google
+        ↓
+    User signs in
+        ↓
+    Google creates ID Token (JWT)
+        ↓
+    Google signs it using Google's Private Key
+        ↓
+    Frontend receives the ID Token
+        ↓
+    Frontend sends ID Token to your backend
+        ↓
+    Backend downloads Google's Public Certificate
+        ↓
+    Extracts Google's Public Key
+        ↓
+    Verifies:
+        - Signature
+        - Audience (aud)
+        - Issuer (iss)
+        - Expiry (exp)
+        ↓
+    If all checks pass,
+    Backend trusts the user's identity.
+
+9. 
