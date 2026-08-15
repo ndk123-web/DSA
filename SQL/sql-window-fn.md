@@ -1,0 +1,274 @@
+# SQL Window Functions — Advanced Analytics Pattern Mastery
+
+## 🎯 Core Mental Model: `GROUP BY` vs `WINDOW FUNCTIONS`
+
+- **`GROUP BY`**: Collapses multiple rows into a single summary row per bucket. **Individual row identity is lost.**
+- **`WINDOW FUNCTION`**: Performs calculations across a window (set) of related rows **WHILE RETAINING EVERY INDIVIDUAL ROW**.
+
+```text
+Input Rows                         GROUP BY department                 WINDOW FUNCTION: OVER(PARTITION BY department)
+┌────────────────────────┐         ┌────────────────────────┐          ┌──────────────────────────────────────────────┐
+│ Amit  | IT | 70000     │         │ IT | Avg Sal: 80000    │          │ Amit  | IT | 70000 | IT_Avg: 80000         │
+│ Priya | IT | 90000     │ ──────► ├────────────────────────┤ ───────► │ Priya | IT | 90000 | IT_Avg: 80000         │
+│ Rahul | HR | 50000     │         │ HR | Avg Sal: 55000    │          │ Rahul | HR | 50000 | HR_Avg: 55000         │
+│ Neha  | HR | 60000     │         └────────────────────────┘          │ Neha  | HR | 60000 | HR_Avg: 55000         │
+└────────────────────────┘                                             └──────────────────────────────────────────────┘
+                                    (Rows Collapsed: 4 ──► 2)           (Rows Retained: 4 ──► 4, Extra Column Added)
+```
+
+---
+
+## ⚡ Basic Syntax of `OVER()` Clause
+
+```sql
+FUNCTION() OVER (
+    PARTITION BY partition_column   -- Optional: Defines window boundaries (like GROUP BY)
+    ORDER BY sort_column             -- Optional: Sorts rows within each window
+    ROWS/RANGE frame_specification   -- Optional: Defines dynamic sub-window frames
+)
+```
+
+---
+
+# Reference Dataset for Examples
+
+### 📥 Input Table: `employees`
+| id | name | department | salary | join_date |
+|---|---|---|---|---|
+| 101 | Amit | IT | 70000 | 2024-01-10 |
+| 102 | Priya | IT | 90000 | 2024-02-15 |
+| 103 | Arjun | IT | 90000 | 2024-03-01 |
+| 104 | Rahul | HR | 50000 | 2024-01-20 |
+| 105 | Neha | HR | 60000 | 2024-04-10 |
+
+---
+
+# 1. Ranking Window Functions
+
+⚡ **Memory Hook**: Assigns ranks to rows within each partition based on sorting order.
+
+| Function | Behavior on Ties (e.g. salaries 90k, 90k, 70k) | Sequence Output |
+|---|---|---|
+| **`ROW_NUMBER()`** | Ignores ties, assigns strictly unique sequential integers | `1, 2, 3, 4` |
+| **`RANK()`** | Same rank for ties, **LEAVES GAPS** in next rank | `1, 1, 3, 4` |
+| **`DENSE_RANK()`** | Same rank for ties, **NO GAPS** in next rank | `1, 1, 2, 3` |
+| **`NTILE(N)`** | Distributes rows into $N$ equal buckets/quartiles | Bucket `1, 1, 2, 2` |
+
+---
+
+## 1.1 `ROW_NUMBER()` vs `RANK()` vs `DENSE_RANK()`
+
+> Problem: **"Rank employees by salary within each department."**
+
+### 💻 Query
+```sql
+SELECT 
+    name,
+    department,
+    salary,
+    ROW_NUMBER() OVER(PARTITION BY department ORDER BY salary DESC) AS row_num,
+    RANK()       OVER(PARTITION BY department ORDER BY salary DESC) AS rnk,
+    DENSE_RANK() OVER(PARTITION BY department ORDER BY salary DESC) AS dense_rnk
+FROM employees;
+```
+
+### 📤 Output Table
+| name | department | salary | row_num | rnk | dense_rnk |
+|---|---|---|---|---|---|
+| Priya | IT | 90000 | 1 | 1 | 1 |
+| Arjun | IT | 90000 | 2 | 1 | 1 |
+| Amit | IT | 70000 | 3 | 3 | 2 |
+| Neha | HR | 60000 | 1 | 1 | 1 |
+| Rahul | HR | 50000 | 2 | 2 | 2 |
+
+> [!KEY TAKEAWAY]
+> - Notice for **IT Department**: Priya & Arjun both have salary 90,000.
+> - `RANK()` gives them both `1`, then skips to `3` for Amit.
+> - `DENSE_RANK()` gives them both `1`, then goes to `2` for Amit.
+> - **Interview Rule**: Use `DENSE_RANK()` when asked for *"Top N unique highest salaries"* (LeetCode 185)!
+
+---
+
+# 2. Navigation Window Functions (`LAG`, `LEAD`, `FIRST_VALUE`, `LAST_VALUE`)
+
+⚡ **Memory Hook**: Allows querying values from previous or next rows **without self-joins**!
+
+- **`LAG(col, offset, default)`**: Looks **BACKWARDS** $offset$ rows (default offset = 1).
+- **`LEAD(col, offset, default)`**: Looks **FORWARDS** $offset$ rows (default offset = 1).
+- **`FIRST_VALUE(col)`**: Returns first value in sorted window.
+- **`LAST_VALUE(col)`**: Returns last value in sorted window.
+
+---
+
+## 2.1 `LAG()` & `LEAD()` — Day-over-Day or Row Differences
+
+### 📥 Input Table: `daily_sales`
+| sale_date | revenue |
+|---|---|
+| 2026-08-01 | 500 |
+| 2026-08-02 | 700 |
+| 2026-08-03 | 650 |
+| 2026-08-04 | 900 |
+
+> Problem: **"Calculate previous day revenue and daily revenue growth."**
+
+### 💻 Query
+```sql
+SELECT 
+    sale_date,
+    revenue AS today_revenue,
+    LAG(revenue, 1, 0) OVER(ORDER BY sale_date ASC) AS prev_day_revenue,
+    revenue - LAG(revenue, 1, 0) OVER(ORDER BY sale_date ASC) AS revenue_growth,
+    LEAD(revenue, 1, 0) OVER(ORDER BY sale_date ASC) AS next_day_revenue
+FROM daily_sales;
+```
+
+### 📤 Output Table
+| sale_date | today_revenue | prev_day_revenue | revenue_growth | next_day_revenue |
+|---|---|---|---|---|
+| 2026-08-01 | 500 | 0 | 500 | 700 |
+| 2026-08-02 | 700 | 500 | +200 | 650 |
+| 2026-08-03 | 650 | 700 | -50 | 900 |
+| 2026-08-04 | 900 | 650 | +250 | 0 |
+
+---
+
+## 2.2 Consecutive Numbers Pattern (LeetCode 180 Pattern)
+
+> Problem: **"Find all numbers that appear at least 3 times consecutively."**
+
+### 📥 Input Table: `logs`
+| id | num |
+|---|---|
+| 1 | 1 |
+| 2 | 1 |
+| 3 | 1 |
+| 4 | 2 |
+| 5 | 1 |
+
+### 💻 Query (Using `LAG` & `LEAD`)
+```sql
+WITH ConsecutiveCTE AS (
+    SELECT 
+        num,
+        LAG(num, 1) OVER(ORDER BY id) AS prev_num,
+        LEAD(num, 1) OVER(ORDER BY id) AS next_num
+    FROM logs
+)
+SELECT DISTINCT num AS ConsecutiveNums
+FROM ConsecutiveCTE
+WHERE num = prev_num AND num = next_num;
+```
+
+### 📤 Output Table
+| ConsecutiveNums |
+|---|
+| 1 |
+
+---
+
+# 3. Aggregate Window Functions & Running Totals
+
+⚡ **Memory Hook**: Performs `SUM()`, `AVG()`, `COUNT()` cumulatively or across partitions without collapsing rows.
+
+---
+
+## 3.1 Cumulative Sum / Running Total
+
+> Problem: **"Calculate cumulative total sales per customer over time."**
+
+### 📥 Input Table: `orders`
+| order_id | customer_id | order_date | amount |
+|---|---|---|---|
+| 1 | 10 | 2026-01-01 | 100 |
+| 2 | 10 | 2026-01-05 | 250 |
+| 3 | 10 | 2026-01-10 | 150 |
+| 4 | 20 | 2026-01-02 | 300 |
+| 5 | 20 | 2026-01-08 | 400 |
+
+### 💻 Query
+```sql
+SELECT 
+    order_id,
+    customer_id,
+    order_date,
+    amount,
+    SUM(amount) OVER(
+        PARTITION BY customer_id 
+        ORDER BY order_date ASC
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS running_total
+FROM orders;
+```
+
+### 📤 Output Table
+| order_id | customer_id | order_date | amount | running_total |
+|---|---|---|---|---|
+| 1 | 10 | 2026-01-01 | 100 | 100 |
+| 2 | 10 | 2026-01-05 | 250 | 350 |
+| 3 | 10 | 2026-01-10 | 150 | 500 |
+| 4 | 20 | 2026-01-02 | 300 | 300 |
+| 5 | 20 | 2026-01-08 | 400 | 700 |
+
+---
+
+## 3.2 Moving Average (3-Row Sliding Frame)
+
+⚡ **Memory Hook**: `ROWS BETWEEN 2 PRECEDING AND CURRENT ROW` calculates average over current row + previous 2 rows.
+
+### 💻 Query
+```sql
+SELECT 
+    sale_date,
+    revenue,
+    ROUND(AVG(revenue) OVER(
+        ORDER BY sale_date ASC
+        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+    ), 2) AS moving_3day_avg
+FROM daily_sales;
+```
+
+---
+
+# 4. CRITICAL GOTCHA: Window Functions in `WHERE` Clause
+
+> [!CAUTION]
+> Window functions are executed **AFTER `WHERE`, `GROUP BY`, and `HAVING`** in the logical processing pipeline.
+> **You CANNOT write**: `WHERE ROW_NUMBER() OVER(...) = 1` directly!
+
+### ❌ WRONG Query
+```sql
+-- FAILS WITH SYNTAX ERROR!
+SELECT name, department, salary
+FROM employees
+WHERE DENSE_RANK() OVER(PARTITION BY department ORDER BY salary DESC) <= 2;
+```
+
+### ✅ CORRECT Query (Wrapped in a CTE / Subquery)
+```sql
+WITH RankedEmployees AS (
+    SELECT 
+        name, 
+        department, 
+        salary,
+        DENSE_RANK() OVER(PARTITION BY department ORDER BY salary DESC) AS rnk
+    FROM employees
+)
+SELECT name, department, salary
+FROM RankedEmployees
+WHERE rnk <= 2;
+```
+
+---
+
+# 5. Master Window Function Pattern Matrix
+
+| Problem Wording Keyword | Window Function Technique | Core Pattern / Formula |
+|---|---|---|
+| *"Highest paid employee per department"* | `DENSE_RANK()` / `ROW_NUMBER()` | `DENSE_RANK() OVER(PARTITION BY dept ORDER BY sal DESC)` |
+| *"Top 3 unique salaries"* | `DENSE_RANK()` + `CTE` | `WHERE rnk <= 3` (No skipped rank numbers) |
+| *"Difference compared to previous row / yesterday"* | `LAG()` | `val - LAG(val, 1) OVER(ORDER BY date)` |
+| *"Value of next row"* | `LEAD()` | `LEAD(val, 1) OVER(ORDER BY date)` |
+| *"3 consecutive identical records"* | `LAG()` & `LEAD()` | `WHERE val = LAG(val) AND val = LEAD(val)` |
+| *"Cumulative total / Running sum over time"* | `SUM() OVER()` | `SUM(amt) OVER(PARTITION BY id ORDER BY date)` |
+| *"Moving 7-day average"* | `AVG() OVER(ROWS BETWEEN)` | `AVG(amt) OVER(ORDER BY date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)` |
