@@ -25,19 +25,18 @@ Raw Rows                   GROUP BY department           Aggregate Function: COU
 ## ⚡ Logical Query Execution Order
 
 ```text
-Syntax Order (How you write it)       Logical Processing Order (How SQL executes it)
-───────────────────────────────       ───────────────────────────────────────────────
-1. SELECT                             1. FROM       ──► Fetch raw table(s)
-2. FROM                               2. JOIN       ──► Combine tables
-3. JOIN                               3. ON         ──► Match join keys
-4. ON                                 4. WHERE      ──► Filter individual ROWS (Pre-grouping)
-5. WHERE                              5. GROUP BY   ──► Partition rows into BUCKETS
-6. GROUP BY                           6. AGGREGATES ──► Compute SUM/AVG/COUNT inside buckets
-7. HAVING                             7. HAVING     ──► Filter BUCKETS (Post-grouping)
-8. ORDER BY                           8. SELECT     ──► Choose & compute final columns
-9. LIMIT / OFFSET                     9. DISTINCT   ──► Deduplicate output
-                                     10. ORDER BY   ──► Sort final output rows
-                                     11. LIMIT      ──► Restrict number of returned rows
+Syntax Order (How You Write It)         Logical Processing Order (How SQL Executes It)
+───────────────────────────────         ──────────────────────────────────────────────────
+1. SELECT                               1. FROM             ──► Fetch base source table(s)
+2. FROM                                 2. JOIN + ON        ──► Stitch related tables together
+3. JOIN + ON                            3. WHERE            ──► Filter individual ROWS (Pre-grouping)
+4. WHERE                                4. GROUP BY         ──► Partition rows into BUCKETS
+5. GROUP BY                             5. HAVING           ──► Filter BUCKETS/GROUPS
+6. HAVING                               6. Window Functions ──► Compute ranks, lags & totals
+7. Window Functions                     7. SELECT           ──► Project & compute final columns
+8. DISTINCT                             8. DISTINCT         ──► Remove duplicate result rows
+9. ORDER BY                             9. ORDER BY         ──► Sort final output rows
+10. LIMIT                              10. LIMIT            ──► Restrict number of returned rows
 ```
 
 ---

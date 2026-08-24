@@ -17,20 +17,22 @@ Instead of memorizing syntax, train your mind to look at a problem description a
 When writing SQL, you write in **Syntax Order**. But the SQL database engine processes your query in **Logical Execution Order**:
 
 ```text
-Syntax Order (How you write it)       Logical Processing Order (How SQL executes it)
-───────────────────────────────       ───────────────────────────────────────────────
-1. SELECT                             1. FROM       ──► Pick table(s) to fetch raw data
-2. FROM                               2. WHERE      ──► Filter rows BEFORE grouping
-3. WHERE                              3. GROUP BY   ──► Group rows into buckets
-4. GROUP BY                           4. HAVING     ──► Filter aggregated groups
-5. HAVING                             5. SELECT     ──► Choose & compute final columns
-6. ORDER BY                           6. DISTINCT   ──► Remove duplicate rows
-7. LIMIT / OFFSET                     7. ORDER BY   ──► Sort the final output rows
-                                      8. LIMIT      ──► Restrict number of rows returned
+Syntax Order (How You Write It)         Logical Processing Order (How SQL Executes It)
+───────────────────────────────         ──────────────────────────────────────────────────
+1. SELECT                               1. FROM             ──► Fetch base source table(s)
+2. FROM                                 2. JOIN + ON        ──► Stitch related tables together
+3. JOIN + ON                            3. WHERE            ──► Filter individual ROWS (Pre-grouping)
+4. WHERE                                4. GROUP BY         ──► Partition rows into BUCKETS
+5. HAVING                               5. HAVING           ──► Filter BUCKETS/GROUPS
+6. Window Functions                     6. Window Functions ──► Compute ranks, lags & totals
+7. DISTINCT                             7. SELECT           ──► Project & compute final columns
+8. ORDER BY                             8. DISTINCT         ──► Remove duplicate result rows
+9. LIMIT                                9. ORDER BY         ──► Sort final output rows
+                                       10. LIMIT            ──► Restrict number of returned rows
 ```
 
 > [!KEY TAKEAWAY]
-> You cannot use a `SELECT` column alias in a `WHERE` clause because `WHERE` executes **BEFORE** `SELECT`!
+> You cannot use a `SELECT` column alias in a `WHERE` clause because `WHERE` (step 3) executes **BEFORE** `SELECT` (step 7)!
 
 ---
 
