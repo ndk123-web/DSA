@@ -128,6 +128,59 @@ FROM users;
 
 ---
 
+## 1.7 Capitalize Single Character / First Letter Only (LeetCode 1667 Pattern)
+
+⚡ **Memory Hook**: To capitalize only the **1st character** of a string and keep the remaining characters **lowercase**:
+1. `UPPER(SUBSTRING(name, 1, 1))` $\rightarrow$ Extracts & upper-cases 1st character.
+2. `LOWER(SUBSTRING(name, 2))` $\rightarrow$ Extracts & lower-cases characters from 2nd position to the end.
+3. `CONCAT(...)` $\rightarrow$ Glues them together.
+
+### 📥 Input Table: `Users`
+| user_id | name |
+|---|---|
+| 1 | aMiT |
+| 2 | pRIYA |
+| 3 | rAHUL |
+
+> Problem: **"Fix names in a table so that only the first character is uppercase and the rest are lowercase (LeetCode 1667)."**
+
+### 💻 SQL Query (LeetCode 1667 Solution)
+```sql
+SELECT 
+    user_id,
+    CONCAT(
+        UPPER(SUBSTRING(name, 1, 1)),
+        LOWER(SUBSTRING(name, 2))
+    ) AS name
+FROM Users
+ORDER BY user_id;
+```
+
+### 📤 Output Table
+| user_id | name |
+|---|---|
+| 1 | Amit |
+| 2 | Priya |
+| 3 | Rahul |
+
+---
+
+### 💡 General Formula: Convert Character at Any Specific Index $i$
+To convert only the $i$-th character of a string to uppercase/lowercase:
+
+```sql
+CONCAT(
+    SUBSTRING(name, 1, i - 1),       -- Characters before index i
+    UPPER(SUBSTRING(name, i, 1)),   -- Convert character at index i
+    SUBSTRING(name, i + 1)          -- Characters after index i
+)
+```
+
+> [!NOTE]
+> PostgreSQL provides a built-in `INITCAP(name)` function that automatically capitalizes the first letter of each word. In MySQL (used by LeetCode), use the `CONCAT` + `SUBSTRING` combination shown above!
+
+---
+
 # 2. Numeric Data Types & Operations
 
 Common types: `INT`/`INTEGER` (whole numbers), `DECIMAL(precision, scale)` (exact decimal/currency), `FLOAT`/`DOUBLE` (approximate floating point).
