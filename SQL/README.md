@@ -99,6 +99,7 @@ Syntax Order (How You Write It)         Logical Processing Order (How SQL Execut
 | 🔗 **[sql-joins.md](file:///d:/DSA/SQL/sql-joins.md)** | `INNER`, `LEFT`, `RIGHT`, `FULL OUTER`, `SELF`, `CROSS` JOINs, `ON` vs `WHERE` |
 | 📊 **[sql-group-by.md](file:///d:/DSA/SQL/sql-group-by.md)** | `COUNT`, `SUM`, `AVG`, `MIN`, `MAX`, `GROUP BY`, `HAVING`, Zero-count handling |
 | ⚡ **[sql-subquries.md](file:///d:/DSA/SQL/sql-subquries.md)** | Subqueries (Scalar, `IN`, Derived `FROM`, Correlated), `CASE WHEN`, `ROUND`, `SUM` |
-| 🪟 **[sql-window-fn.md](file:///d:/DSA/SQL/sql-window-fn.md)** | `OVER()`, `PARTITION BY`, `ROW_NUMBER`, `RANK`, `DENSE_RANK`, `LAG`, `LEAD`, Cumulative `SUM` |
+| 🪟 **[sql-window-fn.md](file:///d:/DSA/SQL/sql-window-fn.md)** | `OVER()`, `PARTITION BY`, Window Frames (`ROWS` vs `RANGE`), `RANK`, `DENSE_RANK`, `LAG`, `LEAD`, Cumulative `SUM` |
+| 🛠️ **[sql-cte.md](file:///d:/DSA/SQL/sql-cte.md)** | Common Table Expressions (CTEs), Custom row injection (`UNION ALL` / `VALUES`), Multiple CTE Chaining, Recursive CTEs |
 | 📅 **[sql-datetime-oprs.md](file:///d:/DSA/SQL/sql-datetime-oprs.md)** | `YEAR`, `MONTH`, `DATE_FORMAT`, `DATE_ADD`, `DATE_SUB`, `DATEDIFF`, Date Range filtering |
 | 🔢 **[sql-datatype-oprs.md](file:///d:/DSA/SQL/sql-datatype-oprs.md)** | String ops (`LENGTH`, `SUBSTRING`, `CONCAT`), Numeric ops, `COALESCE`, `NULLIF`, `CAST` |

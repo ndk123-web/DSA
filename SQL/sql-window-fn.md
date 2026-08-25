@@ -230,7 +230,150 @@ FROM daily_sales;
 
 ---
 
-# 4. CRITICAL GOTCHA: Window Functions in `WHERE` Clause
+# 4. Deep Dive: Window Frames & `OVER()` Variations
+
+Understanding how `OVER()` behaves depending on which clauses are present is crucial for SQL interviews.
+
+```text
+OVER Clause Configuration                  Window Scope & Frame Behavior
+─────────────────────────                  ─────────────────────────────────────────────────────
+OVER ()                                ──► Entire table is 1 window. Fixed grand total for all rows.
+OVER (PARTITION BY dept)               ──► Department window. Fixed department total for all rows.
+OVER (ORDER BY date)                   ──► Entire table window + DEFAULT CUMULATIVE FRAME:
+                                           RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW.
+OVER (PARTITION BY dept ORDER BY date) ──► Department window + CUMULATIVE FRAME per department.
+```
+
+---
+
+## 4.1 What Happens When You Omit `PARTITION BY`?
+
+⚡ **Memory Hook**: If you omit `PARTITION BY`, SQL treats the **ENTIRE TABLE as one single window partition**.
+
+### 💻 Case A: `OVER ()` (No `PARTITION BY`, No `ORDER BY`)
+Computes the grand total / average across all rows and repeats it on every single row.
+
+```sql
+SELECT 
+    name, 
+    salary,
+    SUM(salary) OVER () AS grand_total_salary,
+    ROUND(salary * 100.0 / SUM(salary) OVER (), 2) AS pct_of_company_total
+FROM employees;
+```
+
+### 📤 Output Table
+| name | salary | grand_total_salary | pct_of_company_total |
+|---|---|---|---|
+| Amit | 70000 | 360000 | 19.44% |
+| Priya | 90000 | 360000 | 25.00% |
+| Arjun | 90000 | 360000 | 25.00% |
+| Rahul | 50000 | 360000 | 13.89% |
+| Neha | 60000 | 360000 | 16.67% |
+
+---
+
+## 4.2 What Happens When You Use ONLY `ORDER BY`? (The Default Cumulative Frame)
+
+> [!IMPORTANT]
+> When you add `ORDER BY` inside `OVER()` without specifying a window frame, SQL **automatically applies the default frame**:
+> ```sql
+> RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+> ```
+> This causes aggregate functions like `SUM()`, `AVG()`, `COUNT()` to compute a **CUMULATIVE RUNNING TOTAL** row-by-row instead of a single total!
+
+### 💻 Query
+```sql
+SELECT 
+    id,
+    join_date,
+    salary,
+    -- Simple OVER() = Total salary of entire table
+    SUM(salary) OVER () AS total_salary_fixed,
+    -- OVER(ORDER BY join_date) = CUMULATIVE running total over time
+    SUM(salary) OVER (ORDER BY join_date ASC) AS running_total_salary
+FROM employees;
+```
+
+### 📤 Output Table
+| id | join_date | salary | total_salary_fixed | running_total_salary |
+|---|---|---|---|---|
+| 101 | 2024-01-10 | 70000 | 360000 | 70000 |
+| 104 | 2024-01-20 | 50000 | 360000 | 120000 |
+| 102 | 2024-02-15 | 90000 | 360000 | 210000 |
+| 103 | 2024-03-01 | 90000 | 360000 | 300000 |
+| 105 | 2024-04-10 | 60000 | 360000 | 360000 |
+
+---
+
+## 4.3 Window Frame Specification (`ROWS` vs `RANGE`)
+
+⚡ **Memory Hook**: A **Window Frame** defines the exact subset of rows inside the partition used for calculation relative to the `CURRENT ROW`.
+
+### 📐 Frame Boundary Keywords
+- `UNBOUNDED PRECEDING` $\rightarrow$ First row of the partition.
+- `N PRECEDING` $\rightarrow$ $N$ rows before the current row.
+- `CURRENT ROW` $\rightarrow$ The current row.
+- `N FOLLOWING` $\rightarrow$ $N$ rows after the current row.
+- `UNBOUNDED FOLLOWING` $\rightarrow$ Last row of the partition.
+
+```text
+Visual Frame Architecture relative to CURRENT ROW:
+
+┌─────────────────────────────────────────────────────────┐
+│ UNBOUNDED PRECEDING  (First row of partition)          │
+│ ...                                                     │
+│ 2 PRECEDING          (2 rows back)                      │
+│ 1 PRECEDING          (1 row back)                       │
+│ ═══════════════════════════════════════════════════════ │
+│ CURRENT ROW          (Active processing row)            │
+│ ═══════════════════════════════════════════════════════ │
+│ 1 FOLLOWING          (1 row ahead)                      │
+│ 2 FOLLOWING          (2 rows ahead)                     │
+│ ...                                                     │
+│ UNBOUNDED FOLLOWING  (Last row of partition)           │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 4.4 `ROWS` vs `RANGE` — The Crucial Difference on Duplicate Values
+
+- **`ROWS`**: Operates on **exact physical row numbers**.
+- **`RANGE`**: Operates on **value ranges**. If two rows have identical `ORDER BY` values (ties), `RANGE` treats them as a single logical unit!
+
+### 📥 Example Table: `sales` (Duplicate dates on 2026-08-01)
+| sale_date | amount |
+|---|---|
+| 2026-08-01 | 100 |
+| 2026-08-01 | 100 |
+| 2026-08-02 | 200 |
+
+### 💻 Query
+```sql
+SELECT 
+    sale_date,
+    amount,
+    -- ROWS: Adds exact row-by-row
+    SUM(amount) OVER(ORDER BY sale_date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS rows_running_total,
+    -- RANGE: Includes ALL duplicate order dates in the current calculation step!
+    SUM(amount) OVER(ORDER BY sale_date RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS range_running_total
+FROM sales;
+```
+
+### 📤 Output Table
+| sale_date | amount | rows_running_total | range_running_total |
+|---|---|---|---|
+| 2026-08-01 | 100 | 100 | **200** |
+| 2026-08-01 | 100 | **200** | **200** |
+| 2026-08-02 | 200 | 400 | 400 |
+
+> [!CAUTION]
+> Because `RANGE` includes all ties on the same date at once, the running total for both rows on `2026-08-01` jumps straight to `200`! If you want strict row-by-row incremental addition, **ALWAYS explicitly specify `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`**!
+
+---
+
+# 5. CRITICAL GOTCHA: Window Functions in `WHERE` Clause
 
 > [!CAUTION]
 > Window functions are executed **AFTER `WHERE`, `GROUP BY`, and `HAVING`** in the logical processing pipeline.
@@ -261,14 +404,16 @@ WHERE rnk <= 2;
 
 ---
 
-# 5. Master Window Function Pattern Matrix
+# 6. Master Window Function Pattern Matrix
 
 | Problem Wording Keyword | Window Function Technique | Core Pattern / Formula |
 |---|---|---|
+| *"Grand total on every row / Percentage of total"* | `OVER ()` | `val * 100.0 / SUM(val) OVER()` |
+| *"Cumulative total / Running sum over time"* | `OVER (ORDER BY date)` | `SUM(val) OVER (ORDER BY date)` (Default `RANGE` frame) |
+| *"Strict incremental running total with ties"* | `OVER (... ROWS BETWEEN ...)` | `SUM(val) OVER (ORDER BY date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)` |
 | *"Highest paid employee per department"* | `DENSE_RANK()` / `ROW_NUMBER()` | `DENSE_RANK() OVER(PARTITION BY dept ORDER BY sal DESC)` |
 | *"Top 3 unique salaries"* | `DENSE_RANK()` + `CTE` | `WHERE rnk <= 3` (No skipped rank numbers) |
 | *"Difference compared to previous row / yesterday"* | `LAG()` | `val - LAG(val, 1) OVER(ORDER BY date)` |
 | *"Value of next row"* | `LEAD()` | `LEAD(val, 1) OVER(ORDER BY date)` |
 | *"3 consecutive identical records"* | `LAG()` & `LEAD()` | `WHERE val = LAG(val) AND val = LEAD(val)` |
-| *"Cumulative total / Running sum over time"* | `SUM() OVER()` | `SUM(amt) OVER(PARTITION BY id ORDER BY date)` |
 | *"Moving 7-day average"* | `AVG() OVER(ROWS BETWEEN)` | `AVG(amt) OVER(ORDER BY date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)` |
