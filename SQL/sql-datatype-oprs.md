@@ -181,6 +181,104 @@ CONCAT(
 
 ---
 
+## 1.8 Regular Expressions (`REGEXP` / `RLIKE`) — Advanced Pattern Matching
+
+⚡ **Memory Hook**: When simple `LIKE` wildcard matching (`%` and `_`) is not enough, use **`REGEXP`** (or `RLIKE`) for complex pattern matching (email validation, word boundaries, specific character sets).
+
+### 📐 Core Regex Syntax Reference
+
+| Regex Token | Meaning | Example | Matches |
+|---|---|---|---|
+| `^` | Starts with | `^A` | `Amit`, `Anil` |
+| `$` | Ends with | `.com$` | `gmail.com`, `leetcode.com` |
+| `.` | Any single character | `a.c` | `abc`, `arc`, `a1c` |
+| `[a-z]` | Character range | `^[a-zA-Z]` | Starts with any English letter |
+| `[^0-9]` | Negated set (NOT a digit) | `[^0-9]` | Any non-numeric character |
+| `*` | 0 or more occurrences | `a*` | ``, `a`, `aa`, `aaa` |
+| `+` | 1 or more occurrences | `a+` | `a`, `aa`, `aaa` |
+| `?` | 0 or 1 occurrence | `a?` | ``, `a` |
+| `\|` | Logical OR | `cat\|dog` | `cat`, `dog` |
+| `\\.` | Escaped special character | `\\.` | Literal dot `.` |
+
+---
+
+### 💻 Example A: Validating Email Format (LeetCode 1517 Pattern)
+
+> Problem: **"Find users with valid emails. A valid email has a prefix starting with a letter, followed by letters, digits, '_', '.', or '-', and ending strictly with domain '@leetcode.com'."**
+
+### 📥 Input Table: `Users`
+| user_id | name | mail |
+|---|---|---|
+| 1 | Winston | winston@leetcode.com |
+| 2 | Jonathan | jonathanchan@leetcode.com |
+| 3 | Annabelle | bella-@leetcode.com |
+| 4 | Sally | sally.come@leetcode.com |
+| 5 | Marwan | quaranz457@leetcode.com |
+| 6 | David | david69@gmail.com |
+| 7 | Shapiro | .shapo@leetcode.com |
+
+### 💻 SQL Query
+```sql
+SELECT *
+FROM Users
+WHERE mail REGEXP '^[a-zA-Z][a-zA-Z0-9_.-]*@leetcode\\.com$';
+```
+
+### 📤 Output Table
+| user_id | name | mail |
+|---|---|---|
+| 1 | Winston | winston@leetcode.com |
+| 2 | Jonathan | jonathanchan@leetcode.com |
+| 3 | Annabelle | bella-@leetcode.com |
+| 4 | Sally | sally.come@leetcode.com |
+| 5 | Marwan | quaranz457@leetcode.com |
+
+### 💡 Pattern Explanation: `'^[a-zA-Z][a-zA-Z0-9_.-]*@leetcode\\.com$'`
+1. `^[a-zA-Z]` $\rightarrow$ Must START (`^`) with an upper or lower-case letter.
+2. `[a-zA-Z0-9_.-]*` $\rightarrow$ Followed by 0 or more (`*`) valid prefix characters (letters, numbers, underscore, dot, dash).
+3. `@leetcode\\.com$` $\rightarrow$ Must END (`$`) with literal domain `@leetcode.com` (double backslash escapes the dot).
+
+---
+
+### 💻 Example B: Word Boundary & Standalone Substrings (LeetCode 1527 Pattern)
+
+> Problem: **"Find patients who have Type 1 Diabetes. Their conditions code starts with 'DIAB1' (either at the start of the string OR preceded by a space)."**
+
+### 📥 Input Table: `Patients`
+| patient_id | patient_name | conditions |
+|---|---|---|
+| 1 | Daniel | YFEV COUGH |
+| 2 | Alice |  |
+| 3 | Bob | DIAB100 MYOP |
+| 4 | George | ACNE DIAB100 |
+| 5 | Alain | DIAB201 |
+
+### 💻 SQL Query
+```sql
+SELECT *
+FROM Patients
+WHERE conditions REGEXP '^DIAB1| DIAB1';
+```
+
+### 📤 Output Table
+| patient_id | patient_name | conditions |
+|---|---|---|
+| 3 | Bob | DIAB100 MYOP |
+| 4 | George | ACNE DIAB100 |
+
+### 💡 Pattern Explanation: `'^DIAB1| DIAB1'`
+- `^DIAB1` $\rightarrow$ Condition code `DIAB1` appears right at the start of the string (e.g. `DIAB100 MYOP`).
+- `|` $\rightarrow$ OR
+- ` DIAB1` $\rightarrow$ Condition code `DIAB1` is preceded by a space (e.g. `ACNE DIAB100`).
+
+---
+
+### 💡 Case Sensitivity in REGEXP:
+- **MySQL**: `REGEXP` is case-insensitive by default. To force case sensitivity, use `REGEXP BINARY 'pattern'`.
+- **PostgreSQL**: `~` (case-sensitive match), `~*` (case-insensitive match), `!~` (does NOT match).
+
+---
+
 # 2. Numeric Data Types & Operations
 
 Common types: `INT`/`INTEGER` (whole numbers), `DECIMAL(precision, scale)` (exact decimal/currency), `FLOAT`/`DOUBLE` (approximate floating point).
@@ -384,7 +482,9 @@ SELECT
 | "Trim leading/trailing spaces" | String | `TRIM(column)` |
 | "Extract substring from position" | String | `SUBSTRING(column, start, len)` |
 | "Replace substring" | String | `REPLACE(col, old, new)` |
-| "Combine strings / concatenate" | String | `CONCAT(a, b, c)` |
+| "Complex regex pattern matching" | String | `WHERE col REGEXP 'pattern'` |
+| "Validate email address format" | String / Regex | `WHERE mail REGEXP '^[a-zA-Z]...@leetcode\\.com$'` |
+| "Standalone word boundary matching" | String / Regex | `WHERE conditions REGEXP '^CODE\| CODE'` |
 | "Total sum of numeric column" | Numeric | `SUM(column)` |
 | "Average value" | Numeric | `AVG(column)` |
 | "Min / Max value" | Numeric | `MIN()` / `MAX()` |

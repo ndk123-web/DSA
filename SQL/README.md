@@ -101,5 +101,6 @@ Syntax Order (How You Write It)         Logical Processing Order (How SQL Execut
 | ⚡ **[sql-subquries.md](file:///d:/DSA/SQL/sql-subquries.md)** | Subqueries (Scalar, `IN`, Derived `FROM`, Correlated), `CASE WHEN`, `ROUND`, `SUM` |
 | 🪟 **[sql-window-fn.md](file:///d:/DSA/SQL/sql-window-fn.md)** | `OVER()`, `PARTITION BY`, Window Frames (`ROWS` vs `RANGE`), `RANK`, `DENSE_RANK`, `LAG`, `LEAD`, Cumulative `SUM` |
 | 🛠️ **[sql-cte.md](file:///d:/DSA/SQL/sql-cte.md)** | Common Table Expressions (CTEs), Custom row injection (`UNION ALL` / `VALUES`), Multiple CTE Chaining, Recursive CTEs |
+| ✏️ **[sql-crud-ddl.md](file:///d:/DSA/SQL/sql-crud-ddl.md)** | DDL (`CREATE TABLE`, `ALTER`, `DROP` vs `TRUNCATE` vs `DELETE`), DML (`INSERT`, `UPDATE JOIN`, `DELETE JOIN`), UPSERT, Transactions |
 | 📅 **[sql-datetime-oprs.md](file:///d:/DSA/SQL/sql-datetime-oprs.md)** | `YEAR`, `MONTH`, `DATE_FORMAT`, `DATE_ADD`, `DATE_SUB`, `DATEDIFF`, Date Range filtering |
-| 🔢 **[sql-datatype-oprs.md](file:///d:/DSA/SQL/sql-datatype-oprs.md)** | String ops (`LENGTH`, `SUBSTRING`, `CONCAT`), Numeric ops, `COALESCE`, `NULLIF`, `CAST` |
+| 🔢 **[sql-datatype-oprs.md](file:///d:/DSA/SQL/sql-datatype-oprs.md)** | String ops (`LENGTH`, `SUBSTRING`, `CONCAT`, `REGEXP`), Numeric ops, `COALESCE`, `NULLIF`, `CAST` |
