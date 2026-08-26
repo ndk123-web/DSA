@@ -273,9 +273,107 @@ WHERE conditions REGEXP '^DIAB1| DIAB1';
 
 ---
 
-### 💡 Case Sensitivity in REGEXP:
-- **MySQL**: `REGEXP` is case-insensitive by default. To force case sensitivity, use `REGEXP BINARY 'pattern'`.
-- **PostgreSQL**: `~` (case-sensitive match), `~*` (case-insensitive match), `!~` (does NOT match).
+### 💡 Case Sensitivity & `REGEXP_LIKE()` Function:
+
+While `WHERE column REGEXP 'pattern'` is the operator form, MySQL 8.0+, Oracle, and Snowflake also provide **`REGEXP_LIKE()`** as a built-in function!
+
+---
+
+### 1.8.1 `REGEXP_LIKE(column, pattern [, match_type])`
+
+⚡ **Memory Hook**: `REGEXP_LIKE` works identically to `REGEXP`, but accepts an optional 3rd argument `match_type` to control matching flags!
+
+### 📐 Match Type Flags (`match_type`)
+- `'i'`: Case-insensitive matching.
+- `'c'`: Case-sensitive matching.
+- `'m'`: Multi-line mode (treats `^` and `$` as beginning/end of line).
+- `'n'`: Allows `.` (dot) to match newline characters.
+
+### 💻 Query (Case-Sensitive Search using `'c'`)
+```sql
+-- Finds users whose name starts with capital 'A' strictly
+SELECT *
+FROM Users
+WHERE REGEXP_LIKE(name, '^A', 'c');
+```
+
+---
+
+### 1.8.2 Related Regex Functions (`REGEXP_REPLACE`, `REGEXP_SUBSTR`, `REGEXP_INSTR`)
+
+Beyond `REGEXP_LIKE` (which returns TRUE/FALSE), SQL provides functions to extract, replace, or find indices using regex:
+
+| Function | Purpose | Example | Result |
+|---|---|---|---|
+| **`REGEXP_REPLACE(str, pat, repl)`** | Replaces regex matches with text | `REGEXP_REPLACE('Call 987-654', '[^0-9]', '')` | `'987654'` |
+| **`REGEXP_SUBSTR(str, pat)`** | Extracts matching substring | `REGEXP_SUBSTR('user@gmail.com', '@[a-z.]+')` | `'@gmail.com'` |
+| **`REGEXP_INSTR(str, pat)`** | Returns 1-based index of match | `REGEXP_INSTR('abc123xyz', '[0-9]')` | `4` |
+
+### 💻 Query (Cleaning Phone Numbers with `REGEXP_REPLACE`)
+```sql
+SELECT 
+    phone_raw,
+    REGEXP_REPLACE(phone_raw, '[^0-9]', '') AS clean_numeric_phone
+FROM Contacts;
+```
+
+---
+
+## 1.9 GROUP_CONCAT() — String Aggregation Over Groups
+
+⚡ **Memory Hook**: `GROUP_CONCAT()` combines non-NULL string values from multiple rows in a group into a **single concatenated string**, with optional deduplication (`DISTINCT`), custom sorting (`ORDER BY`), and custom delimiters (`SEPARATOR`).
+
+### 📐 Usage Syntax (MySQL)
+```sql
+GROUP_CONCAT([DISTINCT] column_name [ORDER BY column_name ASC/DESC] [SEPARATOR 'custom_delimiter'])
+```
+
+- Default separator if omitted: `,` (comma).
+
+---
+
+### 💻 Master Example: Group Sold Products By Date (LeetCode 1484 Pattern)
+
+> Problem: **"For each date, find the number of different products sold and their names sorted lexicographically, separated by commas (LeetCode 1484)."**
+
+### 📥 Input Table: `Activities`
+| sell_date | product |
+|---|---|
+| 2020-05-30 | Headphone |
+| 2020-05-30 | Basketball |
+| 2020-05-30 | T-Shirt |
+| 2020-06-01 | Pencil |
+| 2020-06-02 | Mask |
+| 2020-06-02 | Mask |
+
+### 💻 SQL Query
+```sql
+SELECT 
+    sell_date,
+    COUNT(DISTINCT product) AS num_sold,
+    GROUP_CONCAT(DISTINCT product ORDER BY product ASC SEPARATOR ',') AS products
+FROM Activities
+GROUP BY sell_date
+ORDER BY sell_date;
+```
+
+### 📤 Output Table
+| sell_date | num_sold | products |
+|---|---|---|
+| 2020-05-30 | 3 | Basketball,Headphone,T-Shirt |
+| 2020-06-01 | 1 | Pencil |
+| 2020-06-02 | 1 | Mask |
+
+### 💡 Pattern Explanation:
+1. `COUNT(DISTINCT product)` $\rightarrow$ Counts unique products per date (Notice duplicate `'Mask'` on `2020-06-02` counts as 1).
+2. `GROUP_CONCAT(DISTINCT product ORDER BY product ASC SEPARATOR ',')` $\rightarrow$ Deduplicates products, sorts them alphabetically (`Basketball,Headphone,T-Shirt`), and joins them with commas.
+
+---
+
+### 💡 MySQL vs PostgreSQL Dialect Difference:
+- **MySQL**: `GROUP_CONCAT(DISTINCT product ORDER BY product ASC SEPARATOR ',')`
+- **PostgreSQL**: `STRING_AGG(DISTINCT product, ',' ORDER BY product ASC)`
+- **SQL Server**: `STRING_AGG(product, ',') WITHIN GROUP (ORDER BY product ASC)`
 
 ---
 
@@ -483,8 +581,12 @@ SELECT
 | "Extract substring from position" | String | `SUBSTRING(column, start, len)` |
 | "Replace substring" | String | `REPLACE(col, old, new)` |
 | "Complex regex pattern matching" | String | `WHERE col REGEXP 'pattern'` |
+| "Regex matching with match flags ('i', 'c')" | String / Regex | `WHERE REGEXP_LIKE(col, 'pattern', 'i')` |
 | "Validate email address format" | String / Regex | `WHERE mail REGEXP '^[a-zA-Z]...@leetcode\\.com$'` |
 | "Standalone word boundary matching" | String / Regex | `WHERE conditions REGEXP '^CODE\| CODE'` |
+| "Replace non-numeric characters using regex" | String / Regex | `REGEXP_REPLACE(col, '[^0-9]', '')` |
+| "Extract matching regex substring" | String / Regex | `REGEXP_SUBSTR(col, '@[a-z.]+')` |
+| "Combine grouped rows into single string" | String / Aggregation | `GROUP_CONCAT(DISTINCT col ORDER BY col SEPARATOR ',')` |
 | "Total sum of numeric column" | Numeric | `SUM(column)` |
 | "Average value" | Numeric | `AVG(column)` |
 | "Min / Max value" | Numeric | `MIN()` / `MAX()` |
