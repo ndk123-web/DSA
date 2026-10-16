@@ -3,36 +3,36 @@
 Goal: pattern recognition + implementation fluency. This is a curated **150-problem core sheet**, not 150 per individual technique (which would become thousands of problems). Your repo already tracks C++ foundations/STL; focus here on algorithmic recall.
 
 ## Rules for every problem
-- [ ] Identify the pattern before coding.
-- [ ] Write the brute-force idea and complexity in 1–2 lines.
-- [ ] Implement from a blank file in C++ (no looking at old solutions).
-- [ ] Test edge cases: empty/single element, duplicates, negatives, overflow, already sorted/reverse sorted as relevant.
-- [ ] State time and auxiliary-space complexity.
-- [ ] If stuck: 20 minutes of honest attempt, then inspect only the key idea; close it and re-implement.
-- [ ] Revisit misses after 1 day, 3 days, and 7 days.
+- [x] Identify the pattern before coding.
+- [x] Write the brute-force idea and complexity in 1–2 lines.
+- [x] Implement from a blank file in C++ (no looking at old solutions).
+- [x] Test edge cases: empty/single element, duplicates, negatives, overflow, already sorted/reverse sorted as relevant.
+- [x] State time and auxiliary-space complexity.
+- [x] If stuck: 20 minutes of honest attempt, then inspect only the key idea; close it and re-implement.
+- [x] Revisit misses after 1 day, 3 days, and 7 days.
 
 Mark each problem: **G** = solved cleanly from scratch; **Y** = needed a hint / bug fix; **R** = could not derive it. Revise Y/R again.
 
 ## Phase 0 — C++ / STL quick warm-up (not counted in 150)
-- [ ] vector, string, references, const, pass-by-reference
-- [ ] sort + custom comparator, lower_bound / upper_bound
-- [ ] unordered_map / unordered_set vs map / set
-- [ ] stack, queue, deque, priority_queue
-- [ ] pair, tuple, structured bindings
-- [ ] recursion stack, integer overflow, long long
-- [ ] complexity: O(1), O(log n), O(n), O(n log n), O(n²)
+- [x] vector, string, references, const, pass-by-reference
+- [x] sort + custom comparator, lower_bound / upper_bound
+- [x] unordered_map / unordered_set vs map / set
+- [x] stack, queue, deque, priority_queue
+- [x] pair, tuple, structured bindings
+- [x] recursion stack, integer overflow, long long
+- [x] complexity: O(1), O(log n), O(n), O(n log n), O(n²)
 
 ---
 
 # A. Arrays, Hashing & Prefix/Suffix (1–18)
-1. [ ] Two Sum — 1
-2. [ ] Contains Duplicate — 217
-3. [ ] Best Time to Buy and Sell Stock — 121
-4. [ ] Product of Array Except Self — 238
-5. [ ] Maximum Subarray — 53
-6. [ ] Majority Element — 169
-7. [ ] Sort Colors — 75
-8. [ ] Missing Number — 268
+1. [x] Two Sum — 1
+2. [x] Contains Duplicate — 217
+3. [x] Best Time to Buy and Sell Stock — 121
+4. [x] Product of Array Except Self — 238
+5. [x] Maximum Subarray — 53
+6. [x] Majority Element — 169
+7. [x] Sort Colors — 75
+8. [x] Missing Number — 268
 9. [ ] Find All Numbers Disappeared in an Array — 448
 10. [ ] Longest Consecutive Sequence — 128
 11. [ ] Subarray Sum Equals K — 560
