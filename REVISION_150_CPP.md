@@ -33,16 +33,16 @@ Mark each problem: **G** = solved cleanly from scratch; **Y** = needed a hint / 
 6. [x] Majority Element — 169
 7. [x] Sort Colors — 75
 8. [x] Missing Number — 268
-9. [ ] Find All Numbers Disappeared in an Array — 448
-10. [ ] Longest Consecutive Sequence — 128
-11. [ ] Subarray Sum Equals K — 560
-12. [ ] Continuous Subarray Sum — 523
-13. [ ] Range Sum Query - Immutable — 303
-14. [ ] Find Pivot Index — 724
-15. [ ] Maximum Product Subarray — 152
-16. [ ] First Missing Positive — 41
-17. [ ] Set Matrix Zeroes — 73
-18. [ ] Spiral Matrix — 54
+9. [x] Find All Numbers Disappeared in an Array — 448
+10. [x] Longest Consecutive Sequence — 128
+11. [x] Subarray Sum Equals K — 560
+12. [x] Continuous Subarray Sum — 523
+13. [x] Range Sum Query - Immutable — 303
+14. [x] Find Pivot Index — 724
+15. [x] Maximum Product Subarray — 152
+16. [x] First Missing Positive — 41
+17. [x] Set Matrix Zeroes — 73
+18. [x] Spiral Matrix — 54
 
 # B. Two Pointers (19–30)
 19. [ ] Valid Palindrome — 125
