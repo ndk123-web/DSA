@@ -2,6 +2,38 @@
 
 A practical revision guide for the C++ features that should feel automatic before solving DSA problems.
 
+
+## Table of Contents
+
+- [1. Time Complexity and Amortized Analysis](#1-time-complexity-and-amortized-analysis)
+- [2. Essential `std::string` Operations](#2-essential-stdstring-operations)
+  - [Frequently Used Conversions](#frequently-used-conversions)
+  - [Split a String](#split-a-string)
+  - [Trim Whitespace](#trim-whitespace-from-both-ends)
+  - [Lowercase and Uppercase](#convert-a-string-to-lowercase-or-uppercase)
+  - [Character Classification](#check-character-type-alphabetic-digit-or-alphanumeric)
+  - [Type Casting: `static_cast`](#type-casting-with-static_cast)
+  - [`transform()`](#transform-apply-an-operation-to-every-element)
+  - [Lambda Functions](#lambda-functions-parameters--body-)
+  - [`size_t` and `string::npos`](#size_t-container-sizes-and-stringnpos)
+- [3. Character Processing: Filtering and Palindromes](#3-character-processing-filtering-and-palindromes)
+  - [Lowercase Conversion](#31-lowercase-conversion)
+  - [Character Filtering](#32-character-filtering-js-filter-vs-c)
+  - [Two-Pointer Palindrome Check](#33-two-pointer-palindrome-check)
+  - [Complete Alphanumeric Palindrome Solution](#34-complete-alphanumeric-palindrome-solution)
+- [4. Printing Decimal Places](#4-printing-decimal-places)
+- [5. Pass by Value, Reference, and Pointer](#5-pass-by-value-reference-and-pointer)
+- [6. Sorting, Comparators, and Binary Search](#6-sorting-comparators-and-binary-search)
+- [7. Ordered vs. Unordered Associative Containers](#7-ordered-vs-unordered-associative-containers)
+- [8. Stack, Queue, Deque, and Priority Queue](#8-stack-queue-deque-and-priority-queue)
+- [9. Priority Queue and Custom Comparators](#9-priority-queue-and-custom-comparators)
+- [10. Pair, Tuple, and Structured Bindings](#10-pair-tuple-and-structured-bindings)
+- [11. Recursion, Integer Overflow, and `long long`](#11-recursion-integer-overflow-and-long-long)
+- [12. Quick Complexity Checklist](#12-quick-complexity-checklist)
+- [Final Cheat Sheet](#final-cheat-sheet)
+
+---
+
 ## 1. Time Complexity and Amortized Analysis
 
 | Complexity | Typical example |
@@ -352,7 +384,234 @@ if (s.find("xyz") == string::npos) {
 
 Do not test a search result with `pos >= 0`; `size_t` is unsigned. Compare it with `string::npos` instead.
 
-## 3. Printing Decimal Places
+
+## 3. Character Processing: Filtering and Palindromes
+
+This section connects the exact tools used in a common DSA problem: **Valid Palindrome**. The goal is to normalize the text, discard characters that should not participate, and compare the remaining characters.
+
+### 3.1 Lowercase Conversion
+
+**What:** Convert uppercase letters to lowercase. Digits and punctuation remain unchanged.
+
+**Why:** A palindrome check should often ignore letter case. For example, `A` and `a` should compare equal.
+
+**Syntax:**
+
+```cpp
+transform(s.begin(), s.end(), s.begin(), [](unsigned char ch) {
+    return static_cast<char>(tolower(ch));
+});
+```
+
+**Input:** `"A1,Bc!"`
+
+**Output:** `"a1,bc!"`
+
+**Logic, step by step:**
+1. `s.begin()` points to the first character.
+2. `s.end()` marks the end of the range (it is excluded).
+3. The third argument, `s.begin()`, says to write each result back into the same string.
+4. The lambda receives one character at a time.
+5. `tolower(ch)` changes uppercase letters to lowercase; digits and punctuation are unchanged.
+6. `static_cast<char>` converts the result back to the string's character type.
+
+Use `unsigned char` as the lambda parameter when passing characters to `tolower` or other `<cctype>` functions. This avoids undefined behavior for negative plain-`char` values.
+
+### 3.2 Character Filtering: JavaScript `.filter()` vs C++
+
+**What:** Filtering means keeping only the elements that satisfy a condition and excluding all others.
+
+**Why:** In a valid-palindrome problem, spaces and punctuation should not be compared. We want to keep only letters and digits.
+
+In JavaScript, you might write:
+
+```javascript
+const filtered = [...s].filter(ch => /[a-z0-9]/i.test(ch));
+```
+
+Standard C++ `std::string` has no built-in `.filter()` method. There are two common approaches.
+
+**Option A — build a new string (conceptually closest to JS `.filter()`):**
+
+```cpp
+string filtered;
+
+for (unsigned char ch : s) {
+    if (isalnum(ch)) {
+        filtered += static_cast<char>(ch);
+    }
+}
+```
+
+**Input:** `"a,b!2 C"`
+
+**Output:** `"ab2C"`
+
+**Logic:**
+1. Start with an empty string named `filtered`.
+2. Visit each input character.
+3. `isalnum(ch)` returns true only for an alphabetic character or a decimal digit.
+4. Append the character only when the condition is true.
+5. Characters like comma, exclamation mark, and spaces are never appended.
+
+**Option B — filter in place (space-efficient for DSA):**
+
+```cpp
+int idx = 0;
+
+for (int i = 0; i < static_cast<int>(s.size()); ++i) {
+    unsigned char ch = static_cast<unsigned char>(s[i]);
+
+    if (isalnum(ch)) {
+        s[idx] = s[i];
+        ++idx;
+    }
+}
+
+s.resize(idx);
+```
+
+**Input:** `"a,b!2 C"`
+
+**Output after filtering:** `"ab2C"`
+
+**Logic with an index trace:**
+
+| Character read | Is alphanumeric? | Action | `idx` after action |
+|---|---|---|---:|
+| `a` | Yes | Write `a` at `s[0]` | 1 |
+| `,` | No | Skip it | 1 |
+| `b` | Yes | Write `b` at `s[1]` | 2 |
+| `!` | No | Skip it | 2 |
+| `2` | Yes | Write `2` at `s[2]` | 3 |
+| space | No | Skip it | 3 |
+| `C` | Yes | Write `C` at `s[3]` | 4 |
+
+Here, `idx` is the next write position and also the count of characters kept. After the loop, the valid characters occupy indices `0` through `idx - 1`. The original string can still contain stale characters after that point, so `s.resize(idx)` is essential: it changes the actual string length.
+
+**Which should you use?**
+- Use a new string when readability and a separate result are more important.
+- Use in-place filtering when you want (O(1)) auxiliary space and can safely overwrite the original string.
+- Both approaches take (O(n)) time. The new-string approach uses (O(n)) extra space; the in-place approach uses (O(1)) auxiliary space, excluding the input string.
+
+### 3.3 Two-Pointer Palindrome Check
+
+**What:** A palindrome reads the same from left to right and right to left.
+
+**Why:** Comparing both ends lets us check the string without creating a reversed copy.
+
+**Syntax:**
+
+```cpp
+bool palindrome(const string& s) {
+    int l = 0;
+    int r = static_cast<int>(s.size()) - 1;
+
+    while (l < r) {
+        if (s[l] != s[r]) return false;
+        ++l;
+        --r;
+    }
+
+    return true;
+}
+```
+
+**Input:** `"level"`
+
+**Output:** `true`
+
+**Counterexample:** `"hello"` → `false`, because the first and last characters (`h` and `o`) differ.
+
+**Logic:**
+1. Set `l` to the first index and `r` to the last index.
+2. Compare `s[l]` and `s[r]`.
+3. If they differ, the string cannot be a palindrome; return `false` immediately.
+4. Otherwise move `l` one step right and `r` one step left.
+5. If the pointers meet or cross, every required pair matched, so return `true`.
+
+**Why `while (l < r)`?** Each comparison checks a pair. The middle character in an odd-length string does not need a partner, so it is not compared with itself.
+
+**Empty-string note:** For an empty string, `s.size()` is zero. Converting `s.size()` to `int` before subtracting one gives `r = -1`; the loop is skipped and the function returns `true`. This avoids unsigned underflow from directly writing `int r = s.size() - 1`.
+
+**Complexity:** (O(n)) time and (O(1)) auxiliary space.
+
+### 3.4 Complete Alphanumeric Palindrome Solution
+
+This version follows the common Valid Palindrome rule: ignore non-alphanumeric characters and compare letters case-insensitively.
+
+```cpp
+#include <algorithm>
+#include <cctype>
+#include <string>
+using namespace std;
+
+class Solution {
+public:
+    bool isPalindrome(string s) {
+        // Step 1: Normalize letter case.
+        transform(s.begin(), s.end(), s.begin(),
+                  [](unsigned char ch) {
+                      return static_cast<char>(tolower(ch));
+                  });
+
+        // Step 2: Keep only letters and digits.
+        int idx = 0;
+        for (int i = 0; i < static_cast<int>(s.size()); ++i) {
+            unsigned char ch = static_cast<unsigned char>(s[i]);
+
+            if (isalnum(ch)) {
+                s[idx++] = s[i];
+            }
+        }
+        s.resize(idx);
+
+        // Step 3: Compare the cleaned string from both ends.
+        int l = 0;
+        int r = static_cast<int>(s.size()) - 1;
+
+        while (l < r) {
+            if (s[l] != s[r]) return false;
+            ++l;
+            --r;
+        }
+
+        return true;
+    }
+};
+```
+
+**Example A**
+
+- **Input:** `"A man, a plan, a canal: Panama"`
+- **After lowercase conversion:** `"a man, a plan, a canal: panama"`
+- **After filtering:** `"amanaplanacanalpanama"`
+- **Output:** `true`
+
+**Example B**
+
+- **Input:** `"race a car"`
+- **After lowercase conversion:** `"race a car"`
+- **After filtering:** `"raceacar"`
+- **Output:** `false`
+
+**Example C**
+
+- **Input:** `"123, 21"`
+- **After lowercase conversion:** `"123, 21"`
+- **After filtering:** `"12321"`
+- **Output:** `true`
+
+**Why this order?**
+1. Lowercase conversion makes comparisons case-insensitive.
+2. Filtering removes characters that the problem says to ignore.
+3. The two-pointer scan verifies the cleaned sequence.
+
+**Overall complexity:** (O(n)) time. The in-place filtering uses (O(1)) auxiliary space, but the function receives `string s` by value, so the parameter itself is a copy of the caller's string.
+
+---
+
+## 4. Printing Decimal Places
 
 Use `fixed` with `setprecision` from `<iomanip>` to specify the number of digits after the decimal point.
 
@@ -373,7 +632,7 @@ int main() {
 - `fixed << setprecision(4)` displays **four digits after the decimal point**.
 - Formatting changes how a value is printed; it does not change the stored value.
 
-## 4. Pass by Value, Reference, and Pointer
+## 5. Pass by Value, Reference, and Pointer
 
 ### Pass by value: a copy is passed
 
@@ -434,7 +693,7 @@ Remember:
 - `int& ref = a` declares a reference to `a`; use `ref` directly, without `*`.
 - A pointer can be `nullptr`; a reference should refer to a valid object.
 
-## 5. Sorting, Comparators, and Binary Search
+## 6. Sorting, Comparators, and Binary Search
 
 ### Sorting
 
@@ -474,7 +733,7 @@ cout << (hi - lo);        // 3 occurrences of 2
 
 Each binary-search operation takes O(log n) comparisons on a vector's random-access iterators.
 
-## 6. Ordered vs. Unordered Associative Containers
+## 7. Ordered vs. Unordered Associative Containers
 
 | Container | Ordering | Typical lookup | Use when |
 |---|---|---:|---|
@@ -540,7 +799,7 @@ unordered_set<Point, PointHash> points;
 
 Hash collisions are allowed: unequal keys may have the same hash. Equality is used to distinguish keys. Equal keys must always produce equal hashes.
 
-## 7. Stack, Queue, Deque, and Priority Queue
+## 8. Stack, Queue, Deque, and Priority Queue
 
 ```cpp
 stack<int> st; // LIFO: last in, first out
@@ -566,7 +825,7 @@ Typical complexities:
 - `deque`: insertion/removal at either end is O(1).
 - Always check `empty()` before accessing or removing from a possibly empty container.
 
-## 8. Priority Queue and Custom Comparators
+## 9. Priority Queue and Custom Comparators
 
 A default `priority_queue` is a **max-heap**: the largest element is at the top.
 
@@ -637,7 +896,7 @@ Comparator rules:
 - `top()` reads the element; `pop()` removes it. `pop()` does not return the element.
 - `push()` / `pop()` are O(log n); `top()` is O(1).
 
-## 9. Pair, Tuple, and Structured Bindings
+## 10. Pair, Tuple, and Structured Bindings
 
 ```cpp
 pair<int, string> p = {1, "Alice"};
@@ -659,7 +918,7 @@ for (const auto& [word, count] : freq) {
 }
 ```
 
-## 10. Recursion, Integer Overflow, and `long long`
+## 11. Recursion, Integer Overflow, and `long long`
 
 Every recursive function should have a base case and make progress toward it.
 
@@ -676,7 +935,7 @@ Notes:
 - Use `1LL * a * b` when the multiplication must happen in 64-bit integer arithmetic; assigning an already-overflowed `int` result to `long long` does not fix it.
 - For triangular numbers: `1LL * n * (n + 1) / 2`.
 
-## 11. Quick Complexity Checklist
+## 12. Quick Complexity Checklist
 
 Before submitting a solution, ask:
 1. How many times does each loop run?
