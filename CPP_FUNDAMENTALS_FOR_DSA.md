@@ -197,6 +197,161 @@ bool isUpper = isupper(static_cast<unsigned char>(c)); // true
 
 Remember: these are character functions, so call them with one character, for example `isalnum(s[i])`. In locale-dependent C++ character classification, letters beyond basic ASCII may depend on the active locale; these functions are not full Unicode character classifiers.
 
+### Type casting with `static_cast`
+
+Use `static_cast<T>(expression)` to explicitly convert an expression to type `T` when the conversion is supported by C++.
+
+```cpp
+int a = 5, b = 2;
+
+cout << a / b << '\\n'; // 2: integer division
+cout << static_cast<double>(a) / b << '\\n'; // 2.5: floating-point division
+
+double value = 3.9;
+int whole = static_cast<int>(value); // 3: fractional part is discarded
+```
+
+Why use it?
+- It makes a conversion visible and intentional to readers.
+- It can prevent surprises caused by implicit conversions.
+- It does not guarantee that a conversion preserves all information: converting `3.9` to `int` loses the fractional part.
+- It is not a universal cast for every type; the requested conversion must be allowed by C++.
+
+A common safe-use pattern with functions from `<cctype>` is:
+
+```cpp
+char c = s[i];
+bool letter = isalpha(static_cast<unsigned char>(c));
+```
+
+The conversion to `unsigned char` avoids undefined behavior when a plain `char` has a negative value and is passed to C character-classification functions.
+
+### `transform()`: apply an operation to every element
+
+`std::transform` is an algorithm from `<algorithm>`. It applies an operation to each element in an input range and writes the results to a destination range.
+
+General syntax:
+
+```cpp
+transform(first, last, destination, operation);
+```
+
+- `first`, `last`: input range `[first, last)`; `last` is excluded.
+- `destination`: where results are written.
+- `operation`: function or callable that receives each input element and returns its result.
+
+Convert a string to lowercase in place:
+
+```cpp
+#include <algorithm>
+#include <cctype>
+
+string s = "HeLLo 123";
+
+transform(s.begin(), s.end(), s.begin(),
+          [](unsigned char c) {
+              return static_cast<char>(tolower(c));
+          });
+// s == "hello 123"
+```
+
+Convert to uppercase by changing `tolower` to `toupper`:
+
+```cpp
+transform(s.begin(), s.end(), s.begin(),
+          [](unsigned char c) {
+              return static_cast<char>(toupper(c));
+          });
+// s == "HELLO 123"
+```
+
+The third argument is `s.begin()`, so each transformed character overwrites the corresponding character in the same string. The input and output ranges may overlap when used this way.
+
+It also works with numbers:
+
+```cpp
+vector<int> nums = {1, 2, 3, 4};
+
+transform(nums.begin(), nums.end(), nums.begin(),
+          [](int x) { return x * x; });
+// nums == {1, 4, 9, 16}
+```
+
+### Lambda functions: `[](parameters) { body }`
+
+A lambda is an anonymous callable, often used to provide a short operation to algorithms such as `transform`, `sort`, and `count_if`.
+
+```cpp
+[](int x) {
+    return x + 1;
+}
+```
+
+Parts:
+- `[]`: capture list; empty means no outside local variables are captured.
+- `(int x)`: parameter list.
+- `{ return x + 1; }`: body and returned result.
+
+Example with `transform`:
+
+```cpp
+vector<int> v = {2, 3, 4};
+transform(v.begin(), v.end(), v.begin(),
+          [](int x) { return x + 1; });
+// v == {3, 4, 5}
+```
+
+A lambda can capture a local variable when needed:
+
+```cpp
+int add = 10;
+vector<int> v = {1, 2, 3};
+
+transform(v.begin(), v.end(), v.begin(),
+          [add](int x) { return x + add; });
+// v == {11, 12, 13}
+```
+
+Here `[add]` captures `add` by value. `[&add]` captures it by reference. Be careful not to return or store a lambda that refers to local variables whose lifetimes have ended.
+
+### `size_t`, container sizes, and `string::npos`
+
+`size_t` is an unsigned integer type used to represent object sizes and container sizes. For example, `string::size()` and `vector::size()` return `size_t`.
+
+```cpp
+string s = "hello";
+size_t n = s.size(); // 5
+```
+
+Because `size_t` is unsigned, it cannot represent negative values. Converting `-1` to `size_t` produces a large unsigned value, so avoid checks such as `i >= 0` in a loop where `i` is `size_t`: that condition never becomes false.
+
+Safe reverse traversal:
+
+```cpp
+for (size_t i = s.size(); i > 0; --i) {
+    cout << s[i - 1];
+}
+```
+
+This also handles an empty string because the loop does not execute when `s.size() == 0`.
+
+`string::npos` is a special `size_t` value used by string-search operations to mean “not found”.
+
+```cpp
+string s = "hello";
+size_t pos = s.find("ll");
+
+if (pos != string::npos) {
+    cout << pos; // 2
+}
+
+if (s.find("xyz") == string::npos) {
+    cout << "Not found";
+}
+```
+
+Do not test a search result with `pos >= 0`; `size_t` is unsigned. Compare it with `string::npos` instead.
+
 ## 3. Printing Decimal Places
 
 Use `fixed` with `setprecision` from `<iomanip>` to specify the number of digits after the decimal point.
