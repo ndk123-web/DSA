@@ -79,6 +79,124 @@ Notes:
 - `sort(s.begin(), s.end())` sorts characters by their character values.
 - `stoi` / `stoll` can throw exceptions for invalid or out-of-range input.
 
+### Split a string
+
+C++ `std::string` does **not** have a built-in `split()` method. Use `stringstream` for whitespace-separated tokens, or write a small helper for a specific delimiter.
+
+Split by whitespace (consecutive spaces/tabs/newlines are treated as one separator):
+
+```cpp
+#include <sstream>
+
+string s = "  learn   C++\nfor DSA ";
+stringstream ss(s);
+string word;
+
+while (ss >> word) {
+    cout << word << '\\n';
+}
+// learn
+// C++
+// for
+// DSA
+```
+
+Split by a specific delimiter such as comma (this keeps empty fields between consecutive delimiters; a trailing empty field can also be handled explicitly if required):
+
+```cpp
+vector<string> split(const string& s, char delimiter) {
+    vector<string> parts;
+    string part;
+    stringstream ss(s);
+
+    while (getline(ss, part, delimiter)) {
+        parts.push_back(part);
+    }
+    return parts;
+}
+
+// Example: split("red,green,blue", ',') -> {"red", "green", "blue"}
+```
+
+### Trim whitespace from both ends
+
+C++ `std::string` does **not** have a built-in `trim()` method. This helper removes leading and trailing whitespace (spaces, tabs, newlines, etc.):
+
+```cpp
+#include <cctype>
+
+string trim(const string& s) {
+    size_t start = 0;
+    while (start < s.size() &&
+           isspace(static_cast<unsigned char>(s[start]))) {
+        ++start;
+    }
+
+    size_t end = s.size();
+    while (end > start &&
+           isspace(static_cast<unsigned char>(s[end - 1]))) {
+        --end;
+    }
+
+    return s.substr(start, end - start);
+}
+
+// trim("  hello world  ") -> "hello world"
+```
+
+To remove leading whitespace only, use the first loop. To remove trailing whitespace only, use the second loop.
+
+### Convert a string to lowercase or uppercase
+
+There are no member functions named `s.lower()` or `s.upper()` in standard C++. Use `transform` with `tolower` / `toupper` from `<cctype>`.
+
+```cpp
+#include <algorithm>
+#include <cctype>
+
+string s = "HeLLo 123";
+
+transform(s.begin(), s.end(), s.begin(),
+          [](unsigned char c) { return static_cast<char>(tolower(c)); });
+// s == "hello 123"
+
+transform(s.begin(), s.end(), s.begin(),
+          [](unsigned char c) { return static_cast<char>(toupper(c)); });
+// s == "HELLO 123"
+```
+
+The `unsigned char` conversion avoids undefined behavior for negative `char` values when calling the C character-classification functions. These functions are intended for single-byte characters; Unicode case conversion needs a Unicode-aware library.
+
+### Check character type: alphabetic, digit, or alphanumeric
+
+Use functions from `<cctype>`. Pass the character as `unsigned char` to avoid undefined behavior for negative `char` values.
+
+```cpp
+#include <cctype>
+
+char c = 'A';
+
+bool isLetter = isalpha(static_cast<unsigned char>(c)); // true
+bool isDigit  = isdigit(static_cast<unsigned char>(c));  // false
+bool isAlphaNum = isalnum(static_cast<unsigned char>(c)); // true
+bool isSpace = isspace(static_cast<unsigned char>(' '));  // true
+bool isLower = islower(static_cast<unsigned char>(c)); // false
+bool isUpper = isupper(static_cast<unsigned char>(c)); // true
+```
+
+| Function | Returns true when the character is... |
+|---|---|
+| `isalpha(c)` | An alphabetic letter |
+| `isdigit(c)` | A decimal digit, `0`–`9` |
+| `isalnum(c)` | A letter or a digit |
+| `isspace(c)` | Whitespace, such as space, tab, or newline |
+| `islower(c)` | A lowercase letter |
+| `isupper(c)` | An uppercase letter |
+| `ispunct(c)` | A punctuation character |
+| `isxdigit(c)` | A hexadecimal digit, `0`–`9`, `a`–`f`, or `A`–`F` |
+
+Remember: these are character functions, so call them with one character, for example `isalnum(s[i])`. In locale-dependent C++ character classification, letters beyond basic ASCII may depend on the active locale; these functions are not full Unicode character classifiers.
+
 ## 3. Printing Decimal Places
 
 Use `fixed` with `setprecision` from `<iomanip>` to specify the number of digits after the decimal point.
@@ -425,3 +543,7 @@ Before submitting a solution, ask:
 - Need fixed decimal digits: `fixed << setprecision(k)`.
 - Need first value >= x: `lower_bound`; first value > x: `upper_bound`.
 - Need substring: `substr`; search substring: `find`; check against `string::npos`.
+- Need split: use `stringstream` or `getline` with a delimiter; `std::string` has no built-in `split()`.
+- Need trim: write a helper using `isspace`; `std::string` has no built-in `trim()`.
+- Need change case: `transform` with `tolower` or `toupper`.
+- Need classify a character: `isalpha`, `isdigit`, `isalnum`, `isspace`, `islower`, or `isupper`.
