@@ -45,11 +45,11 @@ Mark each problem: **G** = solved cleanly from scratch; **Y** = needed a hint / 
 18. [x] Spiral Matrix — 54
 
 # B. Two Pointers (19–30)
-19. [ ] Valid Palindrome — 125
-20. [ ] Two Sum II - Input Array Is Sorted — 167
-21. [ ] 3Sum — 15
-22. [ ] 4Sum — 18
-23. [ ] Container With Most Water — 11
+19. [x] Valid Palindrome — 125
+20. [x] Two Sum II - Input Array Is Sorted — 167
+21. [x] 3Sum — 15
+22. [x] 4Sum — 18
+23. [x] Container With Most Water — 11
 24. [ ] Remove Duplicates from Sorted Array — 26
 25. [ ] Move Zeroes — 283
 26. [ ] Squares of a Sorted Array — 977
