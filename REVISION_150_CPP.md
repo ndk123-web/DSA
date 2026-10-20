@@ -50,13 +50,13 @@ Mark each problem: **G** = solved cleanly from scratch; **Y** = needed a hint / 
 21. [x] 3Sum — 15
 22. [x] 4Sum — 18
 23. [x] Container With Most Water — 11
-24. [ ] Remove Duplicates from Sorted Array — 26
-25. [ ] Move Zeroes — 283
-26. [ ] Squares of a Sorted Array — 977
-27. [ ] Trapping Rain Water — 42
-28. [ ] Sort Array By Parity — 905
-29. [ ] Backspace String Compare — 844
-30. [ ] Is Subsequence — 392
+24. [x] Remove Duplicates from Sorted Array — 26
+25. [x] Move Zeroes — 283
+26. [x] Squares of a Sorted Array — 977
+27. [x] Trapping Rain Water — 42
+28. [x] Sort Array By Parity — 905
+29. [x] Backspace String Compare — 844
+30. [x] Is Subsequence — 392
 
 # C. Sliding Window (31–42)
 31. [ ] Maximum Average Subarray I — 643
