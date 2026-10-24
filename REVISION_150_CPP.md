@@ -59,7 +59,7 @@ Mark each problem: **G** = solved cleanly from scratch; **Y** = needed a hint / 
 30. [x] Is Subsequence — 392
 
 # C. Sliding Window (31–42)
-31. [ ] Maximum Average Subarray I — 643
+31. [x] Maximum Average Subarray I — 643
 32. [ ] Longest Substring Without Repeating Characters — 3
 33. [ ] Longest Repeating Character Replacement — 424
 34. [ ] Permutation in String — 567
