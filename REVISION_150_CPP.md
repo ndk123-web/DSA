@@ -62,10 +62,10 @@ Mark each problem: **G** = solved cleanly from scratch; **Y** = needed a hint / 
 31. [x] Maximum Average Subarray I — 643
 32. [x] Longest Substring Without Repeating Characters — 3
 33. [x] Longest Repeating Character Replacement — 424
-34. [ ] Permutation in String — 567
-35. [ ] Find All Anagrams in a String — 438
-36. [ ] Minimum Size Subarray Sum — 209
-37. [ ] Max Consecutive Ones III — 1004
+34. [x] Permutation in String — 567
+35. [x] Find All Anagrams in a String — 438
+36. [x] Minimum Size Subarray Sum — 209
+37. [x] Max Consecutive Ones III — 1004
 38. [ ] Fruit Into Baskets — 904
 39. [ ] Minimum Window Substring — 76
 40. [ ] Sliding Window Maximum — 239
