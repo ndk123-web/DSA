@@ -66,9 +66,9 @@ Mark each problem: **G** = solved cleanly from scratch; **Y** = needed a hint / 
 35. [x] Find All Anagrams in a String — 438
 36. [x] Minimum Size Subarray Sum — 209
 37. [x] Max Consecutive Ones III — 1004
-38. [ ] Fruit Into Baskets — 904
-39. [ ] Minimum Window Substring — 76
-40. [ ] Sliding Window Maximum — 239
+38. [x] Fruit Into Baskets — 904
+39. [x] Minimum Window Substring — 76
+40. [x] Sliding Window Maximum — 239
 41. [ ] Subarray Product Less Than K — 713
 42. [ ] Count Number of Nice Subarrays — 1248
 
