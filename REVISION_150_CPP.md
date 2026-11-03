@@ -69,8 +69,8 @@ Mark each problem: **G** = solved cleanly from scratch; **Y** = needed a hint / 
 38. [x] Fruit Into Baskets — 904
 39. [x] Minimum Window Substring — 76
 40. [x] Sliding Window Maximum — 239
-41. [ ] Subarray Product Less Than K — 713
-42. [ ] Count Number of Nice Subarrays — 1248
+41. [x] Subarray Product Less Than K — 713
+42. [x] Count Number of Nice Subarrays — 1248
 
 # D. Binary Search & Search on Answer (43–54)
 43. [ ] Binary Search — 704
