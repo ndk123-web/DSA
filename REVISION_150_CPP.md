@@ -73,7 +73,7 @@ Mark each problem: **G** = solved cleanly from scratch; **Y** = needed a hint / 
 42. [x] Count Number of Nice Subarrays — 1248
 
 # D. Binary Search & Search on Answer (43–54)
-43. [ ] Binary Search — 704
+43. [x] Binary Search — 704
 44. [ ] Search Insert Position — 35
 45. [ ] Find First and Last Position of Element in Sorted Array — 34
 46. [ ] Search in Rotated Sorted Array — 33
