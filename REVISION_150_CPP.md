@@ -74,12 +74,12 @@ Mark each problem: **G** = solved cleanly from scratch; **Y** = needed a hint / 
 
 # D. Binary Search & Search on Answer (43–54)
 43. [x] Binary Search — 704
-44. [ ] Search Insert Position — 35
-45. [ ] Find First and Last Position of Element in Sorted Array — 34
-46. [ ] Search in Rotated Sorted Array — 33
-47. [ ] Find Minimum in Rotated Sorted Array — 153
-48. [ ] Search a 2D Matrix — 74
-49. [ ] Koko Eating Bananas — 875
+44. [x] Search Insert Position — 35
+45. [x] Find First and Last Position of Element in Sorted Array — 34
+46. [x] Search in Rotated Sorted Array — 33
+47. [x] Find Minimum in Rotated Sorted Array — 153
+48. [x] Search a 2D Matrix — 74
+49. [x] Koko Eating Bananas — 875
 50. [ ] Capacity To Ship Packages Within D Days — 1011
 51. [ ] Split Array Largest Sum — 410
 52. [ ] Median of Two Sorted Arrays — 4
