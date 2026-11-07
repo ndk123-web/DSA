@@ -87,9 +87,9 @@ Mark each problem: **G** = solved cleanly from scratch; **Y** = needed a hint / 
 54. [ ] Time Based Key-Value Store — 981
 
 # E. Stack, Monotonic Stack & Queue (55–66)
-55. [ ] Valid Parentheses — 20
-56. [ ] Min Stack — 155
-57. [ ] Evaluate Reverse Polish Notation — 150
+55. [x] Valid Parentheses — 20
+56. [x] Min Stack — 155
+57. [x] Evaluate Reverse Polish Notation — 150
 58. [ ] Daily Temperatures — 739
 59. [ ] Next Greater Element II — 503
 60. [ ] Largest Rectangle in Histogram — 84
