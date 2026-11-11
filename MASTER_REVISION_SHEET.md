@@ -256,6 +256,64 @@ while (!pq.empty()) {
 
 ---
 
+
+### ⚡ Bellman-Ford Algorithm
+
+- **Use case**: Single-source shortest paths when edge weights may be negative.
+- **Core idea**: Repeatedly relax every directed edge. For edge `u -> v` with weight `w`, update `dist[v]` when `dist[u] + w < dist[v]`.
+- **Why `V - 1` rounds?** A shortest path without a cycle uses at most `V - 1` edges. Each full round guarantees propagation across at least one additional edge, regardless of edge ordering.
+- **Negative cycle detection**: After the `V - 1` rounds, another possible relaxation means a negative-weight cycle is reachable from the source.
+- **Important**: Standard in-place Bellman-Ford reads and writes the same `dist` array. Updates may propagate across multiple edges in one round depending on edge order; the `V - 1`-round guarantee still holds. Use a copied array per round when you specifically need to limit paths to at most one additional edge per round (for example, a bounded-flights variant).
+- **Complexity**: `O(V * E)` time and `O(V)` auxiliary space.
+
+### 💻 Template: Standard Bellman-Ford
+
+```cpp
+// edges contains {u, v, weight}; graph is directed.
+vector<long long> bellmanFord(
+    int V,
+    const vector<vector<int>>& edges,
+    int src
+) {
+    const long long INF = LLONG_MAX;
+    vector<long long> dist(V, INF);
+    dist[src] = 0;
+
+    // Relax every edge V - 1 times.
+    for (int i = 0; i < V - 1; i++) {
+        bool changed = false;
+
+        for (const auto& edge : edges) {
+            int u = edge[0];
+            int v = edge[1];
+            int w = edge[2];
+
+            if (dist[u] == INF) continue; // Ignore unreachable u.
+
+            if (dist[u] + w < dist[v]) {
+                dist[v] = dist[u] + w;
+                changed = true;
+            }
+        }
+
+        if (!changed) break; // Early exit: no more improvements.
+    }
+
+    // A further relaxation indicates a source-reachable negative cycle.
+    for (const auto& edge : edges) {
+        int u = edge[0];
+        int v = edge[1];
+        int w = edge[2];
+
+        if (dist[u] != INF && dist[u] + w < dist[v]) {
+            return {}; // Empty result signals a reachable negative cycle.
+        }
+    }
+
+    return dist;
+}
+```
+
 # 11. Dynamic Programming Patterns
 
 | DP Category | State Definition | Transition Formula | Examples |
