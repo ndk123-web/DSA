@@ -258,6 +258,68 @@ while (!pq.empty()) {
 
 
 
+### ⚡ Topological Sorting — Kahn's Algorithm (BFS)
+
+- **Use case**: Find a valid ordering of tasks/courses when some tasks depend on others.
+- **Graph requirement**: Directed Acyclic Graph (DAG). A directed cycle means no valid topological ordering exists.
+- **Indegree**: Number of incoming edges (unfinished prerequisites) for a node.
+- **Core idea**:
+  1. Build the directed adjacency list and calculate each node's indegree.
+  2. Push every node with indegree `0` into a queue; these tasks have no pending prerequisites.
+  3. Pop a node, add it to the ordering, and decrement the indegree of each outgoing neighbour.
+  4. Whenever a neighbour's indegree becomes `0`, push it into the queue.
+  5. If the ordering contains all `V` nodes, a topological ordering exists; otherwise, a cycle is present.
+- **Cycle detection**: Processed node count `!= V` means at least one directed cycle blocks the remaining nodes.
+- **Complexity**: `O(V + E)` time and `O(V + E)` space.
+
+### 💻 Template: Kahn's Algorithm (Topological Order)
+
+```cpp
+vector<int> topologicalSort(int V, vector<vector<int>>& adj) {
+    vector<int> indegree(V, 0);
+
+    // Calculate indegree of every node.
+    for (int u = 0; u < V; u++) {
+        for (int v : adj[u]) {
+            indegree[v]++;
+        }
+    }
+
+    queue<int> q;
+
+    // Start with nodes that have no prerequisites.
+    for (int i = 0; i < V; i++) {
+        if (indegree[i] == 0) {
+            q.push(i);
+        }
+    }
+
+    vector<int> order;
+
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+        order.push_back(u);
+
+        // Completing u removes its outgoing dependency edges.
+        for (int v : adj[u]) {
+            if (--indegree[v] == 0) {
+                q.push(v);
+            }
+        }
+    }
+
+    // Empty result means a directed cycle exists.
+    if (order.size() != V) return {};
+    return order;
+}
+```
+
+- **Classic applications**: Course Schedule (LC 207 — cycle detection) and Course Schedule II (LC 210 — return the ordering).
+
+
+
+
 ### ⚡ Union-Find / Disjoint Set Union (DSU)
 
 - **Use case**: Maintain and merge connected components; efficiently check whether two nodes belong to the same component.
