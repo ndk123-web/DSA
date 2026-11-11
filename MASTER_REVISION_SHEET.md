@@ -257,6 +257,66 @@ while (!pq.empty()) {
 ---
 
 
+
+### ⚡ Union-Find / Disjoint Set Union (DSU)
+
+- **Use case**: Maintain and merge connected components; efficiently check whether two nodes belong to the same component.
+- **Core operations**:
+  - `find(x)`: return the representative (root) of the component containing `x`.
+  - `unite(a, b)`: merge the components containing `a` and `b).
+- **Optimizations**:
+  - **Path compression**: During `find`, make visited nodes point directly to the root.
+  - **Union by size**: Attach the smaller component's root below the larger component's root.
+- **Complexity**: With path compression and union by size, operations take amortized `O(α(V))), effectively constant time; space is `O(V)`.
+- **Cycle detection in an undirected graph**: For each edge `(u, v)`, if `find(u) == find(v)`, the edge connects nodes already in the same component and creates a cycle; otherwise, unite them.
+
+### 💻 Template: Union-Find with Path Compression + Union by Size
+
+```cpp
+class DSU {
+    vector<int> parent;
+    vector<int> sz;
+
+public:
+    DSU(int n) {
+        parent.resize(n);
+        sz.assign(n, 1);
+
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
+        }
+    }
+
+    int find(int x) {
+        if (parent[x] != x) {
+            parent[x] = find(parent[x]); // Path compression
+        }
+        return parent[x];
+    }
+
+    bool unite(int a, int b) {
+        int rootA = find(a);
+        int rootB = find(b);
+
+        if (rootA == rootB) return false;
+
+        // Union by size: keep the larger component as the root.
+        if (sz[rootA] < sz[rootB]) {
+            swap(rootA, rootB);
+        }
+
+        parent[rootB] = rootA;
+        sz[rootA] += sz[rootB];
+        return true;
+    }
+
+    bool connected(int a, int b) {
+        return find(a) == find(b);
+    }
+};
+```
+
+
 ### ⚡ Bellman-Ford Algorithm
 
 - **Use case**: Single-source shortest paths when edge weights may be negative.
