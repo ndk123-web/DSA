@@ -436,6 +436,238 @@ vector<long long> bellmanFord(
 }
 ```
 
+### ⚡ Bipartite Graph — 2-Coloring (BFS / DFS)
+
+- **Definition**: An undirected graph is bipartite if its vertices can be divided into two groups such that every edge connects vertices from different groups.
+- **Equivalent property**: A graph is bipartite if and only if it contains no odd-length cycle.
+- **Core idea**: Color each connected component using two colors. Every neighbour must receive the opposite color. If an edge connects two vertices with the same color, the graph is not bipartite.
+- **Disconnected graphs**: Start BFS/DFS from every uncolored vertex; checking only vertex `0` is insufficient.
+- **Complexity**: `O(V + E)` time and `O(V)` auxiliary space.
+
+### 💻 Template: Bipartite Check using BFS
+
+```cpp
+bool isBipartite(vector<vector<int>>& graph) {
+    int V = graph.size();
+    vector<int> color(V, -1); // -1 = uncolored; 0 and 1 = two groups
+
+    for (int start = 0; start < V; start++) {
+        if (color[start] != -1) continue;
+
+        queue<int> q;
+        q.push(start);
+        color[start] = 0;
+
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+
+            for (int v : graph[u]) {
+                if (color[v] == -1) {
+                    color[v] = 1 - color[u];
+                    q.push(v);
+                } else if (color[v] == color[u]) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+}
+```
+
+- **Typical application**: LeetCode 785 — Is Graph Bipartite?
+
+### ⚡ Cycle Detection in Graphs
+
+#### Undirected Graph — DFS with Parent Tracking
+
+- **Core idea**: During DFS, an already visited neighbour indicates a cycle only when that neighbour is not the current node's parent.
+- **Why parent check?** In an undirected graph, every edge appears in both adjacency lists. The edge back to the parent is not a cycle.
+- **Disconnected graphs**: Run DFS from every unvisited vertex.
+- **Complexity**: `O(V + E)` time and `O(V)` auxiliary space, including recursion stack.
+
+```cpp
+bool dfsCycle(int u, int parent, vector<vector<int>>& adj, vector<bool>& visited) {
+    visited[u] = true;
+    for (int v : adj[u]) {
+        if (!visited[v]) {
+            if (dfsCycle(v, u, adj, visited)) return true;
+        } else if (v != parent) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool hasUndirectedCycle(int V, vector<vector<int>>& adj) {
+    vector<bool> visited(V, false);
+    for (int i = 0; i < V; i++) {
+        if (!visited[i] && dfsCycle(i, -1, adj, visited)) return true;
+    }
+    return false;
+}
+```
+
+#### Undirected Graph — BFS with Parent Tracking
+
+- **Core idea**: Store `(node, parent)` in the queue. A visited neighbour other than the parent reveals a cycle.
+
+```cpp
+bool hasUndirectedCycleBFS(int V, vector<vector<int>>& adj) {
+    vector<bool> visited(V, false);
+    for (int start = 0; start < V; start++) {
+        if (visited[start]) continue;
+        queue<pair<int, int>> q;
+        q.push({start, -1});
+        visited[start] = true;
+
+        while (!q.empty()) {
+            auto [u, parent] = q.front();
+            q.pop();
+            for (int v : adj[u]) {
+                if (!visited[v]) {
+                    visited[v] = true;
+                    q.push({v, u});
+                } else if (v != parent) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+```
+
+#### Undirected Graph — DSU
+
+- Process each edge `(u, v)`. If `find(u) == find(v)`, the endpoints are already connected, so this edge creates a cycle. Otherwise, unite their components.
+- **Complexity**: `O(E α(V))` amortized time and `O(V)` auxiliary space.
+
+```cpp
+bool hasUndirectedCycleDSU(int V, vector<pair<int, int>>& edges) {
+    DSU dsu(V);
+    for (auto [u, v] : edges) {
+        if (dsu.find(u) == dsu.find(v)) return true;
+        dsu.unite(u, v);
+    }
+    return false;
+}
+```
+
+#### Directed Graph — DFS with Recursion-Stack State
+
+- **Core idea**: Use three states: `0 = unvisited`, `1 = currently in the recursion path`, `2 = fully processed`.
+- An edge to a node in state `1` is a back edge and proves a directed cycle. An edge to a node in state `2` does not by itself prove a cycle.
+- **Complexity**: `O(V + E)` time and `O(V)` auxiliary space.
+
+```cpp
+bool dfsDirectedCycle(int u, vector<vector<int>>& adj, vector<int>& state) {
+    state[u] = 1; // In current DFS path
+    for (int v : adj[u]) {
+        if (state[v] == 1) return true;
+        if (state[v] == 0 && dfsDirectedCycle(v, adj, state)) return true;
+    }
+    state[u] = 2; // Fully processed
+    return false;
+}
+
+bool hasDirectedCycle(int V, vector<vector<int>>& adj) {
+    vector<int> state(V, 0);
+    for (int i = 0; i < V; i++) {
+        if (state[i] == 0 && dfsDirectedCycle(i, adj, state)) return true;
+    }
+    return false;
+}
+```
+
+- **Alternative**: Kahn's topological sort detects a directed cycle when fewer than `V` vertices are processed; see the Topological Sorting section.
+
+### ⚡ Minimum Spanning Tree (MST)
+
+- **Definition**: A spanning tree of a connected, weighted, undirected graph that includes all vertices, remains connected, and contains no cycle; an MST minimizes the sum of its edge weights.
+- **Tree property**: Any spanning tree with `V` vertices has exactly `V - 1` edges.
+- **Important distinction**: MST minimizes the total weight of the selected tree; it does not minimize each vertex's shortest-path distance from a source.
+- **Negative edge weights**: Allowed.
+- **Disconnected graph**: No spanning tree exists; a minimum spanning forest can be constructed instead.
+
+#### Kruskal's Algorithm — Edge-Based Greedy
+
+- **Core idea**: Sort all edges by increasing weight. Add an edge only if its endpoints belong to different DSU components; this avoids cycles.
+- **Steps**: Sort edges; initialize DSU; process edges in ascending order, adding and uniting only when the roots differ; stop after `V - 1` selected edges.
+- **Complexity**: `O(E log E)` time for sorting, plus near-constant amortized DSU operations; `O(V)` auxiliary space apart from edge storage.
+
+```cpp
+struct Edge { int u, v, wt; };
+
+long long kruskalMST(int V, vector<Edge>& edges) {
+    sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {
+        return a.wt < b.wt;
+    });
+
+    DSU dsu(V);
+    long long mstCost = 0;
+    int edgesUsed = 0;
+
+    for (const Edge& e : edges) {
+        if (dsu.find(e.u) == dsu.find(e.v)) continue;
+        dsu.unite(e.u, e.v);
+        mstCost += e.wt;
+        if (++edgesUsed == V - 1) break;
+    }
+
+    return edgesUsed == V - 1 ? mstCost : -1; // -1: disconnected
+}
+```
+
+#### Prim's Algorithm — Vertex-Based Greedy
+
+- **Core idea**: Grow one tree. At each step, choose the minimum-weight edge connecting a vertex already in the tree to one outside it.
+- **Steps**: Start from any vertex with weight `0`; repeatedly extract the minimum candidate, skip visited vertices, add the selected weight, and push edges to unvisited neighbours. Finish after all `V` vertices are included.
+- **Complexity**: `O(E log V)` time with an adjacency list and min-heap for a simple graph; `O(V + E)` auxiliary space including adjacency list and heap.
+
+```cpp
+long long primMST(int V, vector<vector<pair<int, int>>>& adj) {
+    // Each adjacency entry is {neighbour, edgeWeight}.
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    vector<bool> visited(V, false);
+    pq.push({0, 0}); // {edgeWeight, vertex}
+
+    long long mstCost = 0;
+    int verticesUsed = 0;
+
+    while (!pq.empty()) {
+        auto [wt, u] = pq.top();
+        pq.pop();
+        if (visited[u]) continue;
+
+        visited[u] = true;
+        mstCost += wt;
+        verticesUsed++;
+
+        for (auto [v, edgeWt] : adj[u]) {
+            if (!visited[v]) pq.push({edgeWt, v});
+        }
+    }
+
+    return verticesUsed == V ? mstCost : -1; // -1: disconnected
+}
+```
+
+#### Kruskal vs Prim — Quick Comparison
+
+| Point | Kruskal | Prim |
+|---|---|---|
+| Greedy choice | Globally lightest safe edge | Lightest edge leaving the current tree |
+| View | Edge-based | Vertex/tree-based |
+| Main data structure | DSU + sorted edge list | Min-heap + visited array |
+| Cycle handling | DSU rejects an edge joining the same component | Visited array skips included vertices |
+| Typical complexity | `O(E log E)` | `O(E log V)` with adjacency list + heap |
+| Disconnected graph | Produces a minimum spanning forest if run to completion | Repeat from unvisited vertices to produce a forest |
+
+- **Common problems**: LeetCode 1584 — Min Cost to Connect All Points; LeetCode 1135 — Connecting Cities With Minimum Cost (Premium).
+
 # 11. Dynamic Programming Patterns
 
 | DP Category | State Definition | Transition Formula | Examples |
