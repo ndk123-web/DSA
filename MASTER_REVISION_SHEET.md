@@ -668,6 +668,91 @@ long long primMST(int V, vector<vector<pair<int, int>>>& adj) {
 
 - **Common problems**: LeetCode 1584 — Min Cost to Connect All Points; LeetCode 1135 — Connecting Cities With Minimum Cost (Premium).
 
+### ⚡ Greedy Algorithms
+
+- **Definition**: Greedy makes a locally best choice at each step. It is correct only when those choices can be shown to lead to a globally optimal solution.
+- **Important**: Greedy does not mean sorting. Sorting, two pointers, heaps, or a direct scan are implementation techniques that may help choose the next action.
+- **Recognition questions**: What are we maximizing/minimizing? What is the best choice now? Can we prove that committing to this choice does not prevent an optimal solution?
+- **Correctness warning**: A locally optimal choice does not automatically guarantee a globally optimal answer. Some problems that look greedy require DP instead.
+
+#### Assign Cookies — Sorting + Two Pointers (LeetCode 455)
+
+- **Goal**: Maximize the number of children satisfied. `g[i]` is a child's minimum cookie size; `s[j]` is a cookie size.
+- **Greedy choice**: Process the least-greedy child first and give them the smallest cookie that satisfies them. If a cookie is too small, discard it and try the next larger cookie.
+- **Why it works**: A child who needs less should not consume a larger cookie when a smaller sufficient cookie is available; preserve larger cookies for children with larger requirements.
+- **Complexity**: `O(n log n + m log m)` time for sorting and `O(1)` auxiliary space apart from sorting implementation.
+
+```cpp
+int findContentChildren(vector<int>& g, vector<int>& s) {
+    sort(g.begin(), g.end());
+    sort(s.begin(), s.end());
+
+    int i = 0, j = 0;
+    int satisfied = 0;
+
+    while (i < g.size() && j < s.size()) {
+        if (s[j] >= g[i]) {
+            satisfied++;
+            i++;
+        }
+        j++; // Use this cookie or discard it if it was too small.
+    }
+
+    return satisfied;
+}
+```
+
+#### Maximize Sum After K Negations — Sorting + Greedy (LeetCode 1005)
+
+- **Goal**: Maximize the array sum after exactly `k` sign flips.
+- **Greedy choice**: Flip the most negative values first, because changing a negative `x` to `-x` increases the sum by `-2*x`; the more negative `x` is, the larger the gain.
+- After all negative values are handled, if flips remain and their count is odd, flip the element with the smallest absolute value. An even number of flips on that same element has no net effect.
+- **Complexity**: `O(n log n)` time due to sorting and `O(1)` auxiliary space apart from sorting implementation.
+
+```cpp
+int largestSumAfterKNegations(vector<int>& nums, int k) {
+    sort(nums.begin(), nums.end());
+
+    for (int i = 0; i < nums.size() && k > 0 && nums[i] < 0; i++, k--) {
+        nums[i] = -nums[i];
+    }
+
+    if (k % 2 == 1) {
+        auto it = min_element(nums.begin(), nums.end(),
+            [](int a, int b) { return abs(a) < abs(b); });
+        *it = -*it;
+    }
+
+    return accumulate(nums.begin(), nums.end(), 0);
+}
+```
+
+#### Jump Game — Greedy Reachability (LeetCode 55)
+
+- **Goal**: Determine whether the last index can be reached. `nums[i]` is the maximum jump length from index `i`.
+- **Greedy state**: `maxReach` stores the farthest index reachable from any position visited so far.
+- **Transition**: At each index `i`, first ensure `i <= maxReach`; otherwise, this index cannot be reached and the answer is false. If reachable, update `maxReach = max(maxReach, i + nums[i])`.
+- **Early success**: If `maxReach >= n - 1`, the last index is reachable.
+- **Complexity**: `O(n)` time and `O(1)` auxiliary space.
+
+```cpp
+bool canJump(vector<int>& nums) {
+    int n = nums.size();
+    int maxReach = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (i > maxReach) return false; // Current index is unreachable.
+
+        maxReach = max(maxReach, i + nums[i]);
+        if (maxReach >= n - 1) return true;
+    }
+
+    return true; // Includes the single-element case.
+}
+```
+
+- **Pattern distinction**: Jump Game does not require choosing an exact jump at each index. Track the farthest reachable boundary instead.
+
 # 11. Dynamic Programming Patterns
 
 | DP Category | State Definition | Transition Formula | Examples |
