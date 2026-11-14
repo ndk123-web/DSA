@@ -30,6 +30,7 @@ A practical revision guide for the C++ features that should feel automatic befor
 - [10. Pair, Tuple, and Structured Bindings](#10-pair-tuple-and-structured-bindings)
 - [11. Recursion, Integer Overflow, and `long long`](#11-recursion-integer-overflow-and-long-long)
 - [12. Quick Complexity Checklist](#12-quick-complexity-checklist)
+- [13. C++ Input and Output (I/O)](#13-c-input-and-output-io)
 - [Final Cheat Sheet](#final-cheat-sheet)
 
 ---
@@ -945,6 +946,344 @@ Before submitting a solution, ask:
 5. Does recursion branch? Estimate the number of calls and recursion depth.
 6. Is integer overflow possible for values, products, or sums?
 7. Are the container operations appropriate for the required ordering?
+
+## 13. C++ Input and Output (I/O)
+
+This section covers the common input formats used in coding assessments such as TCS: reading numbers, arrays, strings, complete lines, and splitting text. It also explains C++ stream synchronization, ties, buffering, and flushing.
+
+### 13.1 Standard input and output: cin and cout
+
+- **cin** is the standard input stream (normally connected to test input).
+- **cout** is the standard output stream (normally connected to the judge's output).
+- **cerr** is the standard error stream, commonly used for diagnostics.
+
+~~~cpp
+int n;
+cin >> n;                  // Read one integer
+
+int a, b;
+cin >> a >> b;             // Read two integers
+
+cout << a + b << '\n';     // Print the result and a newline
+~~~
+
+Formatted extraction with **>>** skips leading whitespace. Therefore, values can be separated by spaces, tabs, or newlines; the physical line layout usually does not matter.
+
+### 13.2 Read one integer or multiple integers
+
+~~~cpp
+int n;
+cin >> n;
+~~~
+
+Input:
+~~~text
+10
+~~~
+
+Read two or more values in one statement:
+
+~~~cpp
+int a, b, c;
+cin >> a >> b >> c;
+~~~
+
+Input:
+~~~text
+10 20 30
+~~~
+
+The same statement also works if the values are on separate lines because **>>** treats whitespace as a separator.
+
+### 13.3 Read an array / vector
+
+Common input format: first read the number of elements, then read that many values.
+
+Input:
+~~~text
+5
+10 20 30 40 50
+~~~
+
+~~~cpp
+int n;
+cin >> n;
+
+vector<int> arr(n);
+
+for (int i = 0; i < n; ++i) {
+    cin >> arr[i];
+}
+~~~
+
+Print the vector:
+
+~~~cpp
+for (int x : arr) {
+    cout << x << ' ';
+}
+cout << '\n';
+~~~
+
+### 13.4 Read a string without spaces: cin >> s
+
+~~~cpp
+string s;
+cin >> s;
+~~~
+
+Input:
+~~~text
+hello
+~~~
+
+This reads one whitespace-separated token. If the input is **hello world**, only **hello** is read by this extraction; the next token remains in the stream.
+
+### 13.5 Read a complete line, including spaces: getline
+
+~~~cpp
+string line;
+getline(cin, line);
+~~~
+
+Input:
+~~~text
+I love competitive programming
+~~~
+
+The entire line is stored in **line**. By default, getline reads characters until the newline delimiter; it does not split the line into words.
+
+**Mixing cin >> and getline:** formatted extraction leaves the newline after the last token in the input stream. A following getline may consume that leftover newline and return an empty string.
+
+~~~cpp
+int n;
+cin >> n;
+
+cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+string line;
+getline(cin, line);
+~~~
+
+**cin.ignore(..., '\n')** discards characters through the next newline. Another concise option is **getline(cin >> ws, line)**, which first consumes leading whitespace; use it when leading whitespace in the intended line should be discarded.
+
+### 13.6 Read and split a line with stringstream
+
+A **stringstream** (from the **<sstream>** header) lets us treat an in-memory string as an input stream. It is useful when a complete line has already been read and we want to extract tokens from it.
+
+~~~cpp
+string line = "apple banana mango orange";
+stringstream ss(line);
+
+vector<string> words;
+string word;
+
+while (ss >> word) {
+    words.push_back(word);
+}
+~~~
+
+Result: **{"apple", "banana", "mango", "orange"}**.
+
+**What does ss >> word do?**
+
+- Reads the next token from the string stream.
+- Skips leading whitespace.
+- Stops at the next whitespace character (space, tab, newline, etc.).
+- Stores the token in the destination variable.
+- Advances the stream's read position.
+
+Extraction also converts according to the destination type:
+
+~~~cpp
+string line = "101 NDK 95.5";
+stringstream ss(line);
+
+int id;
+string name;
+double marks;
+
+ss >> id >> name >> marks;
+// id = 101, name = "NDK", marks = 95.5
+~~~
+
+This is whitespace-based token extraction, not comma splitting. For comma-separated input, specify the delimiter with getline:
+
+~~~cpp
+string line = "apple,banana,mango";
+stringstream ss(line);
+
+vector<string> words;
+string word;
+
+while (getline(ss, word, ',')) {
+    words.push_back(word);
+}
+~~~
+
+### 13.7 Two different uses of getline
+
+The same function name is used with different input sources and delimiters:
+
+~~~cpp
+string line;
+getline(cin, line);       // Read from standard input until newline
+~~~
+
+~~~cpp
+string token;
+getline(ss, token, ',');  // Read from string stream until comma
+~~~
+
+General form:
+
+~~~cpp
+getline(input_stream, destination_string, delimiter);
+~~~
+
+The delimiter is consumed but is not included in the destination string. If omitted, the delimiter defaults to newline ('\n').
+
+### 13.8 C I/O vs. C++ I/O and synchronization
+
+C provides functions such as:
+
+~~~c
+scanf("%d", &n);
+printf("%d\n", n);
+~~~
+
+C++ provides stream operations:
+
+~~~cpp
+cin >> n;
+cout << n << '\n';
+~~~
+
+By default, the standard C++ streams are synchronized with their corresponding C standard streams. This supports coordinated use of C and C++ I/O.
+
+~~~cpp
+ios_base::sync_with_stdio(false);
+~~~
+
+Calling this before any I/O disables that synchronization. It can improve performance for large input/output workloads because the C++ streams no longer need to maintain that coordination.
+
+**Practical rule:** after disabling synchronization, use one I/O family consistently. Prefer **cin / cout**; avoid mixing them with **scanf / printf** because their independently buffered operations can produce unexpected ordering.
+
+### 13.9 What is a stream tie? cin.tie()
+
+By default, **cin** is tied to **cout**:
+
+~~~cpp
+cin.tie(&cout); // Default relationship
+~~~
+
+A tied output stream is flushed before an input operation on the tied stream. This is useful for interactive prompts:
+
+~~~cpp
+cout << "Enter your age: ";
+
+int age;
+cin >> age;
+~~~
+
+The prompt is flushed before the program waits for input because **cin** is tied to **cout**.
+
+For competitive programming, we commonly write:
+
+~~~cpp
+cin.tie(nullptr);
+~~~
+
+This removes the automatic tie. It can avoid repeated flushes before input operations and improve performance when processing large batches of input.
+
+If the tie is disabled and an interactive prompt must be shown immediately, flush explicitly:
+
+~~~cpp
+cin.tie(nullptr);
+
+cout << "Enter your age: " << flush;
+
+int age;
+cin >> age;
+~~~
+
+### 13.10 Output buffering and flushing
+
+Output streams commonly use a **buffer**: a temporary memory area where output is collected before being sent to its destination. Buffering reduces the overhead of sending many tiny pieces of output separately.
+
+**Flush** means requesting that pending buffered output be sent to the destination.
+
+~~~cpp
+cout << "Hello" << flush; // Send pending output now; no newline is added
+~~~
+
+Compare the common output operations:
+
+| Expression | Writes newline? | Explicitly flushes? |
+|---|---:|---:|
+| cout << '\n' | Yes | No |
+| cout << endl | Yes | Yes |
+| cout << flush | No | Yes |
+
+Prefer **'\n'** for ordinary coding-assessment output. Repeated use of **endl** can be slower because it flushes the stream each time.
+
+Use **flush** when output must be visible immediately, especially in interactive programs. A tied **cin** normally flushes **cout** before waiting for input.
+
+**Do not confuse these concepts:**
+- **Synchronization** coordinates C and C++ standard I/O streams.
+- **Tying** configures an automatic flush of one output stream before input on another stream.
+- **Flushing** sends pending buffered output to its destination.
+
+### 13.11 Standard competitive-programming I/O template
+
+~~~cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n;
+    cin >> n;
+
+    vector<int> arr(n);
+    for (int i = 0; i < n; ++i) {
+        cin >> arr[i];
+    }
+
+    // Apply the required algorithm.
+
+    cout << "Result" << '\n';
+    return 0;
+}
+~~~
+
+These two optimization lines are common, but not mandatory for small inputs:
+
+~~~cpp
+ios_base::sync_with_stdio(false);
+cin.tie(nullptr);
+~~~
+
+For ordinary non-interactive coding assessments, you generally do not need to manage buffers or call **flush** manually.
+
+### 13.12 Quick I/O reference
+
+| Requirement | Pattern |
+|---|---|
+| Read one integer | cin >> n; |
+| Read two integers | cin >> a >> b; |
+| Read an array | Loop with cin >> arr[i]; |
+| Read one token/string without spaces | cin >> s; |
+| Read a complete line | getline(cin, line); |
+| Discard leftover newline after formatted input | cin.ignore(numeric_limits<streamsize>::max(), '\n'); |
+| Split a line by whitespace | stringstream ss(line); while (ss >> word) |
+| Split a line by comma | while (getline(ss, token, ',')) |
+| Disable C/C++ stream synchronization | ios_base::sync_with_stdio(false); |
+| Remove cin's default tie to cout | cin.tie(nullptr); |
+| Print newline without explicit flush | cout << '\n'; |
+| Explicitly flush output | cout << flush; |
 
 ## Final Cheat Sheet
 
